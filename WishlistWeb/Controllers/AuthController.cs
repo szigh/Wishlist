@@ -33,6 +33,12 @@ namespace WishlistWeb.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<LoginResponseDto>> Login(LoginRequestDto request)
         {
+            // Validate input
+            if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Password))
+            {
+                return BadRequest(new { message = "Username and password are required" });
+            }
+
             // Find user by name
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Name == request.Name);
@@ -65,6 +71,12 @@ namespace WishlistWeb.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<LoginResponseDto>> Register(LoginRequestDto request)
         {
+            // Validate input
+            if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Password))
+            {
+                return BadRequest(new { message = "Username and password are required" });
+            }
+
             // Check if username already exists
             var existingUser = await _context.Users
                 .FirstOrDefaultAsync(u => u.Name == request.Name);
