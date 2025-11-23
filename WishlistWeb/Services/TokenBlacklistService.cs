@@ -22,6 +22,7 @@ namespace WishlistWeb.Services
             _blacklistedTokens.TryAdd(tokenId, expiration);
             
             // Periodic cleanup to prevent memory buildup
+            // Use Interlocked.Read for thread-safe read of 64-bit value
             var nowTicks = DateTime.UtcNow.Ticks;
             var lastCleanupTicks = Interlocked.Read(ref _lastCleanupTicks);
             
