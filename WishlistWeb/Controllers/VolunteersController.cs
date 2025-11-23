@@ -89,18 +89,12 @@ namespace WishlistWeb.Controllers
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteVolunteer(int id)
     {
-        var volunteer = await context.Volunteers.FindAsync(id);
-        if (volunteer == null) return NotFound();
-
         // Get the current user's ID from JWT claims
         var error = ValidateAndGetUserId(out int userId);
         if (error != null) return error;
 
-        // Verify the user owns this claim
-        if (volunteer.VolunteerUserId != userId)
-        {
-            return Forbid(); // 403 Forbidden - user doesn't own this claim
-        }
+        var volunteer = await context.Volunteers.FirstOrDefaultAsync(v => v.Id == id && v.VolunteerUserId == userId);
+        if (volunteer == null) return NotFound();
 
         context.Volunteers.Remove(volunteer);
 
