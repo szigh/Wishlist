@@ -33,6 +33,12 @@ namespace WishlistWeb.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<LoginResponseDto>> Login(LoginRequestDto request)
         {
+            var validationResult = ValidateLoginRequest(request);
+            if (validationResult != null)
+            {
+                return validationResult;
+            }
+
             // Find user by name
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Name == request.Name);
@@ -65,6 +71,12 @@ namespace WishlistWeb.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<LoginResponseDto>> Register(LoginRequestDto request)
         {
+            var validationResult = ValidateLoginRequest(request);
+            if (validationResult != null)
+            {
+                return validationResult;
+            }
+
             // Check if username already exists
             var existingUser = await _context.Users
                 .FirstOrDefaultAsync(u => u.Name == request.Name);
@@ -123,6 +135,20 @@ namespace WishlistWeb.Controllers
             _tokenBlacklistService.BlacklistToken(tokenId, expiration);
 
             return Ok(new { message = "Logged out successfully" });
+        }
+
+        private ActionResult? ValidateLoginRequest(LoginRequestDto request)
+        {
+            if (request == null)
+            {
+                return BadRequest(new { message = "Request cannot be null" });
+            }
+
+            if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Password))
+            {
+                return BadRequest(new { message = "Username and password are required" });
+            }
+            return null;
         }
 
         /// <summary>
