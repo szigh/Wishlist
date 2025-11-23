@@ -52,8 +52,6 @@ namespace WishlistWeb.Controllers
         public async Task<ActionResult<UserReadDto>> PostUser(UserCreateDto dto)
         {
             var user = _mapper.Map<User>(dto);
-            var hasher = new PasswordHasher<UserCreateDto>();
-
             // Hash password before saving
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
