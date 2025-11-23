@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="Contracts/Contracts.csproj" Id="7047faf6-e087-4297-8084-4f1a5b25a78b" />
-  <Project Path="Models/Models.csproj" />
+  <Project Path="WishlistContracts/WishlistContracts.csproj" Id="7047faf6-e087-4297-8084-4f1a5b25a78b" />
+  <Project Path="WishlistModels/WishlistModels.csproj" />
   <Project Path="WishlistWeb/WishlistWeb.csproj" />
 </Solution>

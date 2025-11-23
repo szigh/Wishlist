@@ -1,19 +1,21 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using Contracts.DTOs;
+using WishlistContracts.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Models;
-using System;
+using WishlistModels;
 
 namespace WishlistWeb.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class GiftController(WishlistDbContext _context, IMapper _mapper) 
-        : ControllerBase
+    public class GiftController(WishlistDbContext _context, IMapper _mapper)
+        : BaseApiController
     {
+
         // GET: api/gifts
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GiftReadDto>>> GetGifts()
         {
@@ -23,6 +25,7 @@ namespace WishlistWeb.Controllers
         }
 
         // GET: api/gifts/5
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<GiftReadDto>> GetGift(int id)
         {
@@ -37,10 +40,16 @@ namespace WishlistWeb.Controllers
         }
 
         // POST: api/gifts
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<GiftReadDto>> PostGift(GiftCreateDto giftDto)
         {
+            // Get the current user's ID from JWT claims
+            var error = ValidateAndGetUserId(out int userId);
+            if (error != null) return error;
+
             var gift = _mapper.Map<Gift>(giftDto);
+            gift.UserId = userId; // Set the owner to the authenticated user
             _context.Gifts.Add(gift);
             await _context.SaveChangesAsync();
 
@@ -49,10 +58,15 @@ namespace WishlistWeb.Controllers
         }
 
         // PUT: api/gifts/5
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutGift(int id, GiftUpdateDto updateDto)
         {
-            var gift = await _context.Gifts.FindAsync(id);
+            // Get the current user's ID from JWT claims
+            var error = ValidateAndGetUserId(out int userId);
+            if (error != null) return error;
+
+            var gift = await _context.Gifts.FirstOrDefaultAsync(g => g.Id == id && g.UserId == userId);
             if (gift == null) return NotFound();
 
             // Map onto the existing tracked entity
@@ -78,6 +92,7 @@ namespace WishlistWeb.Controllers
         }
 
         // DELETE: api/gifts/5
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGift(int id)
         {
@@ -85,6 +100,16 @@ namespace WishlistWeb.Controllers
             if (gift == null)
             {
                 return NotFound();
+            }
+
+            // Get the current user's ID from JWT claims
+            var error = ValidateAndGetUserId(out int userId);
+            if (error != null) return error;
+
+            // Check if the user owns this gift
+            if (gift.UserId != userId)
+            {
+                return Forbid(); // 403 Forbidden - user doesn't own this gift
             }
 
             _context.Gifts.Remove(gift);

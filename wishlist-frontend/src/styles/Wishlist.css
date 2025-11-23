@@ -1,0 +1,152 @@
+.wishlist-page,
+.my-wishlist-page,
+.my-claims-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.wishlist-header,
+.page-header {
+  margin-bottom: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wishlist-header h1,
+.page-header h1 {
+  margin: 0 0 8px 0;
+  font-size: 32px;
+  color: #333;
+}
+
+.wishlist-header p,
+.page-header p {
+  margin: 0;
+  color: #666;
+}
+
+.gifts-grid,
+.claims-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.gift-card,
+.claim-card {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.3s;
+}
+
+.gift-card:hover,
+.claim-card:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.gift-card.claimed {
+  background: #f8f8f8;
+  border-color: #d0d0d0;
+}
+
+.gift-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 12px;
+}
+
+.gift-header h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #333;
+  flex: 1;
+}
+
+.claimed-badge {
+  background: #4caf50;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.gift-description,
+.claim-description {
+  color: #666;
+  margin: 12px 0;
+  line-height: 1.5;
+}
+
+.gift-category,
+.claim-category {
+  display: inline-block;
+  background: #f0f0f0;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  color: #666;
+  margin: 8px 0;
+}
+
+.gift-link,
+.claim-link {
+  display: inline-block;
+  color: #667eea;
+  text-decoration: none;
+  margin: 12px 0;
+  font-weight: 500;
+}
+
+.gift-link:hover,
+.claim-link:hover {
+  text-decoration: underline;
+}
+
+.btn-claim,
+.btn-delete,
+.btn-unclaim {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 16px;
+}
+
+.btn-claim {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-claim:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-delete {
+  background: #fee;
+  color: #c33;
+  border: 1px solid #fcc;
+}
+
+.btn-delete:hover {
+  background: #fdd;
+}
+
+.btn-unclaim {
+  background: #fff3e0;
+  color: #f57c00;
+  border: 1px solid #ffe0b2;
+}
+
+.btn-unclaim:hover {
+  background: #ffe0b2;
+}

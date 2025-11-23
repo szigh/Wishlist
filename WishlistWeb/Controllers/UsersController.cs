@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using Contracts.DTOs;
+using WishlistContracts.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Models;
+using WishlistModels;
 
 namespace WishlistWeb.Controllers
 {
@@ -12,8 +13,8 @@ namespace WishlistWeb.Controllers
     public class UsersController(WishlistDbContext context, IMapper _mapper)
         : ControllerBase
     {
-
         // GET: api/users
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserReadDto>>> GetUsers()
         {
@@ -29,6 +30,7 @@ namespace WishlistWeb.Controllers
         }
 
         // GET: api/users/5
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<UserReadDto>> GetUser(int id)
         {
@@ -38,47 +40,34 @@ namespace WishlistWeb.Controllers
         }
 
         // GET: api/users/gifts/5
-        [HttpGet("gifts/{id}")]
-        public async Task<ActionResult<UserWishlistReadDto>> GetUsersGifts(int id)
+        [Authorize]
+        [HttpGet("{userId}/wishlist")]
+        public async Task<ActionResult<UserWishlistReadDto>> GetUsersGifts(int userId)
         {
-            var user = await context.Users.Include(u => u.Gifts).FirstAsync(u => u.Id == id);
+            var user = await context.Users.Include(u => u.Gifts).FirstOrDefaultAsync(u => u.Id == userId);
             if (user == null) return NotFound();
             return _mapper.Map<UserWishlistReadDto>(user);
         }
 
-        // POST: api/users
-        [HttpPost]
-        public async Task<ActionResult<UserReadDto>> PostUser(UserCreateDto dto)
-        {
-            var user = _mapper.Map<User>(dto);
-            // Hash password before saving
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
-            context.Users.Add(user);
+        [Authorize(Roles = "admin")]
+        [HttpPut("{id}")]
+        public async Task<ActionResult<UserReadDto>> PutUser(int id, UserUpdateDto dto)
+        {
+            var user = await context.Users.FindAsync(id);
+            if (user == null) return NotFound();
+
+            // Map onto the existing tracked entity
+            _mapper.Map(dto, user);
+
             await context.SaveChangesAsync();
 
             var readDto = _mapper.Map<UserReadDto>(user);
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, readDto);
+            return Ok(readDto);
         }
 
-
-        //TODO only allow admin to update users
-        //[HttpPut("{id}")]
-        //public async Task<ActionResult<UserReadDto>> PutUser(int id, UserUpdateDto dto)
-        //{
-        //    var user = await context.Users.FindAsync(id);
-        //    if (user == null) return NotFound();
-
-        //    // Map onto the existing tracked entity
-        //    _mapper.Map(dto, user);
-
-        //    await context.SaveChangesAsync();
-
-        //    var readDto = _mapper.Map<UserReadDto>(user);
-        //    return Ok(readDto);
-        //}
-
         // DELETE: api/users/5
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
