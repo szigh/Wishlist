@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace Models
+namespace WishlistModels
 {
     public class WishlistDbContext : DbContext
     {

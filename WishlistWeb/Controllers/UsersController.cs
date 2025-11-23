@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using Contracts.DTOs;
+using WishlistContracts.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Models;
+using WishlistModels;
 
 namespace WishlistWeb.Controllers
 {

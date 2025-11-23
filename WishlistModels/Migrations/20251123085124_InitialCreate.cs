@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Models.Migrations
+namespace WishlistModels.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration

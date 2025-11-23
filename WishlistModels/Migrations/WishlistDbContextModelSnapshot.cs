@@ -2,11 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Models;
+using WishlistModels;
 
 #nullable disable
 
-namespace Models.Migrations
+namespace WishlistModels.Migrations
 {
     [DbContext(typeof(WishlistDbContext))]
     partial class WishlistDbContextModelSnapshot : ModelSnapshot

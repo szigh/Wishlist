@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Contracts.DTOs;
-using Models;
+using WishlistContracts.DTOs;
+using WishlistModels;
 
 namespace WishlistWeb
 {

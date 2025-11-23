@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Models;
+using WishlistModels;
 
 #nullable disable
 
-namespace Models.Migrations
+namespace WishlistModels.Migrations
 {
     [DbContext(typeof(WishlistDbContext))]
     [Migration("20251123085124_InitialCreate")]

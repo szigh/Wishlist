@@ -16,8 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Contracts\Contracts.csproj" />
-    <ProjectReference Include="..\Models\Models.csproj" />
+    <ProjectReference Include="..\WishlistContracts\WishlistContracts.csproj" />
+    <ProjectReference Include="..\WishlistModels\WishlistModels.csproj" />
   </ItemGroup>
 
 </Project>

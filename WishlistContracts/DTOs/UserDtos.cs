@@ -1,4 +1,4 @@
-﻿namespace Contracts.DTOs
+﻿namespace WishlistContracts.DTOs
 {
     // For creating a new user (admin only)
     public class UserCreateDto

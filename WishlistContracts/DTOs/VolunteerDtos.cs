@@ -1,4 +1,4 @@
-﻿namespace Contracts.DTOs
+﻿namespace WishlistContracts.DTOs
 {
     // For volunteering for a gift
     public class VolunteerCreateDto

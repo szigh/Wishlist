@@ -5,8 +5,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Contracts.DTOs;
-using Models;
+using WishlistContracts.DTOs;
+using WishlistModels;
 using WishlistWeb.Services;
 
 namespace WishlistWeb.Controllers

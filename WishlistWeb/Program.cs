@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Models;
+using WishlistModels;
 using WishlistWeb;
 using WishlistWeb.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
