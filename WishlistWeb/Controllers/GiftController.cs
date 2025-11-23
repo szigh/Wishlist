@@ -1,19 +1,20 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Contracts.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
-using System;
 
 namespace WishlistWeb.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class GiftController(WishlistDbContext _context, IMapper _mapper) 
+    public class GiftController(WishlistDbContext _context, IMapper _mapper)
         : ControllerBase
     {
         // GET: api/gifts
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GiftReadDto>>> GetGifts()
         {
@@ -23,6 +24,7 @@ namespace WishlistWeb.Controllers
         }
 
         // GET: api/gifts/5
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<GiftReadDto>> GetGift(int id)
         {
@@ -37,6 +39,7 @@ namespace WishlistWeb.Controllers
         }
 
         // POST: api/gifts
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<GiftReadDto>> PostGift(GiftCreateDto giftDto)
         {
@@ -49,6 +52,7 @@ namespace WishlistWeb.Controllers
         }
 
         // PUT: api/gifts/5
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutGift(int id, GiftUpdateDto updateDto)
         {
@@ -78,6 +82,7 @@ namespace WishlistWeb.Controllers
         }
 
         // DELETE: api/gifts/5
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGift(int id)
         {

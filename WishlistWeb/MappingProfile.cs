@@ -12,6 +12,7 @@ namespace WishlistWeb
             CreateMap<User, UserReadDto>();
             CreateMap<User, UserWishlistReadDto>();
             CreateMap<UserCreateDto, User>()
+                .ForMember(dest => dest.Role, opt => opt.MapFrom(_ => "user"))
                 .ForMember(dest => dest.PasswordHash, opt => opt.Ignore()); // handled manually
             CreateMap<UserUpdateDto, User>()
                 .ForMember(dest => dest.PasswordHash, opt => opt.Ignore()) // never overwrite password

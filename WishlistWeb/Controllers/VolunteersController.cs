@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
 
@@ -8,6 +9,7 @@ public class VolunteersController(WishlistDbContext context) : ControllerBase
 {
     // GET: api/volunteers
     [HttpGet]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<Volunteer>>> GetVolunteers()
     {
         return await context.Volunteers
@@ -17,6 +19,7 @@ public class VolunteersController(WishlistDbContext context) : ControllerBase
     }
 
     // GET: api/volunteers/5
+    [Authorize]
     [HttpGet("{id}")]
     public async Task<ActionResult<Volunteer>> GetVolunteer(int id)
     {
@@ -30,6 +33,7 @@ public class VolunteersController(WishlistDbContext context) : ControllerBase
     }
 
     // POST: api/volunteers
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<Volunteer>> PostVolunteer(Volunteer volunteer)
     {
@@ -44,6 +48,7 @@ public class VolunteersController(WishlistDbContext context) : ControllerBase
     }
 
     // DELETE: api/volunteers/5
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteVolunteer(int id)
     {
