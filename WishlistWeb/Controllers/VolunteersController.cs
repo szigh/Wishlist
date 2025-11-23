@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
 using WishlistModels;
 
 [ApiController]
@@ -13,7 +14,7 @@ public class VolunteersController(WishlistDbContext context) : ControllerBase
     public async Task<ActionResult<IEnumerable<Volunteer>>> GetVolunteers()
     {
         // Get the current user's ID from JWT claims
-        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
         if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
         {
             return Unauthorized("Invalid user token");
@@ -33,7 +34,7 @@ public class VolunteersController(WishlistDbContext context) : ControllerBase
     public async Task<ActionResult<Volunteer>> GetVolunteer(int id)
     {
         // Get the current user's ID from JWT claims
-        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
         if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
         {
             return Unauthorized("Invalid user token");
@@ -61,7 +62,7 @@ public class VolunteersController(WishlistDbContext context) : ControllerBase
     public async Task<ActionResult<Volunteer>> PostVolunteer(Volunteer volunteer)
     {
         // Get the current user's ID from JWT claims
-        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
         if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
         {
             return Unauthorized("Invalid user token");
@@ -99,7 +100,7 @@ public class VolunteersController(WishlistDbContext context) : ControllerBase
         if (volunteer == null) return NotFound();
 
         // Get the current user's ID from JWT claims
-        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
         if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
         {
             return Unauthorized("Invalid user token");
