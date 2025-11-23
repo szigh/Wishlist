@@ -13,16 +13,6 @@ namespace WishlistWeb.Controllers
     public class GiftController(WishlistDbContext _context, IMapper _mapper)
         : BaseApiController
     {
-        // Helper method to get the current user's ID from JWT claims
-        private (bool Success, int UserId, ActionResult ErrorResult) GetCurrentUserId()
-        {
-            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
-            {
-                return (false, 0, Unauthorized("Invalid user token"));
-            }
-            return (true, userId, null!);
-        }
 
         // GET: api/gifts
         [Authorize]
