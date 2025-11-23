@@ -47,6 +47,8 @@ namespace WishlistWeb.Controllers
         }
 
         // POST: api/users
+        // Admin only - for creating users without self-registration
+        // For user registration, use POST /api/auth/register instead
         [HttpPost]
         public async Task<ActionResult<UserReadDto>> PostUser(UserCreateDto dto)
         {
