@@ -39,16 +39,9 @@ namespace WishlistWeb.Controllers
         var volunteer = await context.Volunteers
             .Include(v => v.Gift)
             .Include(v => v.VolunteerUser)
-            .FirstOrDefaultAsync(v => v.Id == id);
+            .FirstOrDefaultAsync(v => v.Id == id && v.VolunteerUserId == userId);
 
-        if (volunteer == null) return NotFound();
-
-        // Verify the user owns this claim
-        if (volunteer.VolunteerUserId != userId)
-        {
-            return Forbid(); // 403 Forbidden - user doesn't own this claim
-        }
-
+        if (volunteer == null) return NotFound(); // Could be not found OR not owned by user
         return volunteer;
     }
 
