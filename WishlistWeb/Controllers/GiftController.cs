@@ -14,14 +14,14 @@ namespace WishlistWeb.Controllers
         : ControllerBase
     {
         // Helper method to get the current user's ID from JWT claims
-        private ActionResult<int>? GetCurrentUserId()
+        private (bool Success, int UserId, ActionResult? ErrorResult) GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
             {
-                return Unauthorized("Invalid user token");
+                return (false, 0, Unauthorized("Invalid user token"));
             }
-            return userId;
+            return (true, userId, null);
         }
 
         // GET: api/gifts
@@ -54,12 +54,11 @@ namespace WishlistWeb.Controllers
         [HttpPost]
         public async Task<ActionResult<GiftReadDto>> PostGift(GiftCreateDto giftDto)
         {
-            var userIdResult = GetCurrentUserId();
-            if (userIdResult?.Result != null)
+            var (success, userId, errorResult) = GetCurrentUserId();
+            if (!success)
             {
-                return userIdResult.Result;
+                return errorResult!;
             }
-            int userId = userIdResult!.Value;
 
             var gift = _mapper.Map<Gift>(giftDto);
             gift.UserId = userId; // Set the owner to the authenticated user
@@ -78,12 +77,11 @@ namespace WishlistWeb.Controllers
             var gift = await _context.Gifts.FindAsync(id);
             if (gift == null) return NotFound();
 
-            var userIdResult = GetCurrentUserId();
-            if (userIdResult?.Result != null)
+            var (success, userId, errorResult) = GetCurrentUserId();
+            if (!success)
             {
-                return userIdResult.Result;
+                return errorResult!;
             }
-            int userId = userIdResult!.Value;
 
             // Check if the user owns this gift
             if (gift.UserId != userId)
@@ -124,12 +122,11 @@ namespace WishlistWeb.Controllers
                 return NotFound();
             }
 
-            var userIdResult = GetCurrentUserId();
-            if (userIdResult?.Result != null)
+            var (success, userId, errorResult) = GetCurrentUserId();
+            if (!success)
             {
-                return userIdResult.Result;
+                return errorResult!;
             }
-            int userId = userIdResult!.Value;
 
             // Check if the user owns this gift
             if (gift.UserId != userId)
