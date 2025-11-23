@@ -1,64 +1,92 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Contracts.DTOs;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-[ApiController]
-[Route("api/[controller]")]
-public class UsersController : ControllerBase
+namespace WishlistWeb.Controllers
 {
-    private readonly WishlistDbContext _context;
-
-    public UsersController(WishlistDbContext context)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class UsersController(WishlistDbContext context, IMapper _mapper)
+        : ControllerBase
     {
-        _context = context;
-    }
 
-    // GET: api/users
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<User>>> GetUsers()
-    {
-        return await _context.Users.ToListAsync();
-    }
+        // GET: api/users
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<UserReadDto>>> GetUsers()
+        {
+            return await context.Users
 
-    // GET: api/users/5
-    [HttpGet("{id}")]
-    public async Task<ActionResult<User>> GetUser(int id)
-    {
-        var user = await _context.Users.FindAsync(id);
-        if (user == null) return NotFound();
-        return user;
-    }
+                //.Select(u => mapper.Map<UserReadDto>(u)) 
+                //inefficient as EF will map one-by-one
 
-    // POST: api/users
-    [HttpPost]
-    public async Task<ActionResult<User>> PostUser(User user)
-    {
-        // TODO: hash password before saving
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
-    }
+                .ProjectTo<UserReadDto>(_mapper.ConfigurationProvider)
+                //more efficient as EF will translate mapping to SQL
+                //avoids loading unnecessary properties
+                .ToListAsync();
+        }
 
-    // PUT: api/users/5
-    [HttpPut("{id}")]
-    public async Task<IActionResult> PutUser(int id, User user)
-    {
-        if (id != user.Id) return BadRequest();
-        _context.Entry(user).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
-        return NoContent();
-    }
+        // GET: api/users/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<UserReadDto>> GetUser(int id)
+        {
+            var user = await context.Users.FindAsync(id);
+            if (user == null) return NotFound();
+            return _mapper.Map<UserReadDto>(user);
+        }
 
-    // DELETE: api/users/5
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteUser(int id)
-    {
-        var user = await _context.Users.FindAsync(id);
-        if (user == null) return NotFound();
-        _context.Users.Remove(user);
-        await _context.SaveChangesAsync();
-        return NoContent();
+        // GET: api/users/gifts/5
+        [HttpGet("gifts/{id}")]
+        public async Task<ActionResult<UserWishlistReadDto>> GetUsersGifts(int id)
+        {
+            var user = await context.Users.Include(u => u.Gifts).FirstAsync(u => u.Id == id);
+            if (user == null) return NotFound();
+            return _mapper.Map<UserWishlistReadDto>(user);
+        }
+
+        // POST: api/users
+        [HttpPost]
+        public async Task<ActionResult<UserReadDto>> PostUser(UserCreateDto dto)
+        {
+            var user = _mapper.Map<User>(dto);
+            // Hash password before saving
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+
+            context.Users.Add(user);
+            await context.SaveChangesAsync();
+
+            var readDto = _mapper.Map<UserReadDto>(user);
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, readDto);
+        }
+
+
+        //TODO only allow admin to update users
+        //[HttpPut("{id}")]
+        //public async Task<ActionResult<UserReadDto>> PutUser(int id, UserUpdateDto dto)
+        //{
+        //    var user = await context.Users.FindAsync(id);
+        //    if (user == null) return NotFound();
+
+        //    // Map onto the existing tracked entity
+        //    _mapper.Map(dto, user);
+
+        //    await context.SaveChangesAsync();
+
+        //    var readDto = _mapper.Map<UserReadDto>(user);
+        //    return Ok(readDto);
+        //}
+
+        // DELETE: api/users/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            var user = await context.Users.FindAsync(id);
+            if (user == null) return NotFound();
+            context.Users.Remove(user);
+            await context.SaveChangesAsync();
+            return NoContent();
+        }
     }
 }

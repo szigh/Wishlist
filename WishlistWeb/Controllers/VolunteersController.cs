@@ -1,25 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 [ApiController]
 [Route("api/[controller]")]
-public class VolunteersController : ControllerBase
+public class VolunteersController(WishlistDbContext context) : ControllerBase
 {
-    private readonly WishlistDbContext _context;
-
-    public VolunteersController(WishlistDbContext context)
-    {
-        _context = context;
-    }
-
     // GET: api/volunteers
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Volunteer>>> GetVolunteers()
     {
-        return await _context.Volunteers
+        return await context.Volunteers
             .Include(v => v.Gift)
             .Include(v => v.VolunteerUser)
             .ToListAsync();
@@ -29,7 +20,7 @@ public class VolunteersController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<Volunteer>> GetVolunteer(int id)
     {
-        var volunteer = await _context.Volunteers
+        var volunteer = await context.Volunteers
             .Include(v => v.Gift)
             .Include(v => v.VolunteerUser)
             .FirstOrDefaultAsync(v => v.Id == id);
@@ -42,13 +33,13 @@ public class VolunteersController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Volunteer>> PostVolunteer(Volunteer volunteer)
     {
-        _context.Volunteers.Add(volunteer);
+        context.Volunteers.Add(volunteer);
 
         // Mark gift as taken
-        var gift = await _context.Gifts.FindAsync(volunteer.GiftId);
-        if (gift != null) gift.IsTaken = true;
+        var gift = await context.Gifts.FindAsync(volunteer.GiftId);
+        gift?.IsTaken = true;
 
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
         return CreatedAtAction(nameof(GetVolunteer), new { id = volunteer.Id }, volunteer);
     }
 
@@ -56,16 +47,16 @@ public class VolunteersController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteVolunteer(int id)
     {
-        var volunteer = await _context.Volunteers.FindAsync(id);
+        var volunteer = await context.Volunteers.FindAsync(id);
         if (volunteer == null) return NotFound();
 
-        _context.Volunteers.Remove(volunteer);
+        context.Volunteers.Remove(volunteer);
 
         // Reset gift status if needed
-        var gift = await _context.Gifts.FindAsync(volunteer.GiftId);
-        if (gift != null) gift.IsTaken = false;
+        var gift = await context.Gifts.FindAsync(volunteer.GiftId);
+        gift?.IsTaken = false;
 
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
         return NoContent();
     }
 }

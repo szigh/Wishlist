@@ -1,30 +1,30 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Contracts.DTOs;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using System;
 
 namespace WishlistWeb.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class WishlistController : ControllerBase
+    public class GiftController(WishlistDbContext _context, IMapper _mapper) 
+        : ControllerBase
     {
-        private readonly WishlistDbContext _context;
-
-        public WishlistController(WishlistDbContext context)
-        {
-            _context = context;
-        }
-
-        // GET: api/wishlist
+        // GET: api/gifts
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Gift>>> GetGifts()
+        public async Task<ActionResult<IEnumerable<GiftReadDto>>> GetGifts()
         {
-            return await _context.Gifts.ToListAsync();
+            return await _context.Gifts
+                .ProjectTo<GiftReadDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
         }
 
-        // GET: api/wishlist/5
+        // GET: api/gifts/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Gift>> GetGift(int id)
+        public async Task<ActionResult<GiftReadDto>> GetGift(int id)
         {
             var gift = await _context.Gifts.FindAsync(id);
 
@@ -33,29 +33,30 @@ namespace WishlistWeb.Controllers
                 return NotFound();
             }
 
-            return gift;
+            return _mapper.Map<GiftReadDto>(gift);
         }
 
-        // POST: api/wishlist
+        // POST: api/gifts
         [HttpPost]
-        public async Task<ActionResult<Gift>> PostGift(Gift gift)
+        public async Task<ActionResult<GiftReadDto>> PostGift(GiftCreateDto giftDto)
         {
+            var gift = _mapper.Map<Gift>(giftDto);
             _context.Gifts.Add(gift);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetGift), new { id = gift.Id }, gift);
+            var readDto = _mapper.Map<GiftReadDto>(gift);
+            return CreatedAtAction(nameof(GetGift), new { id = gift.Id }, readDto);
         }
 
-        // PUT: api/wishlist/5
+        // PUT: api/gifts/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutGift(int id, Gift gift)
+        public async Task<IActionResult> PutGift(int id, GiftUpdateDto updateDto)
         {
-            if (id != gift.Id)
-            {
-                return BadRequest();
-            }
+            var gift = await _context.Gifts.FindAsync(id);
+            if (gift == null) return NotFound();
 
-            _context.Entry(gift).State = EntityState.Modified;
+            // Map onto the existing tracked entity
+            _mapper.Map(updateDto, gift);
 
             try
             {
@@ -76,7 +77,7 @@ namespace WishlistWeb.Controllers
             return NoContent();
         }
 
-        // DELETE: api/wishlist/5
+        // DELETE: api/gifts/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGift(int id)
         {
