@@ -41,7 +41,7 @@ namespace WishlistWeb.Controllers
         [HttpGet("gifts/{id}")]
         public async Task<ActionResult<UserReadDto>> GetUsersGifts(int id)
         {
-            var user = await context.Users.Include(u => u.Gifts).FirstAsync(u => u.Id == id);
+            var user = await context.Users.Include(u => u.Gifts).FirstOrDefaultAsync(u => u.Id == id);
             if (user == null) return NotFound();
             return _mapper.Map<UserReadDto>(user);
         }
