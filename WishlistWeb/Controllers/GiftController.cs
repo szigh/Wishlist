@@ -4,6 +4,7 @@ using WishlistContracts.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
 using WishlistModels;
 
 namespace WishlistWeb.Controllers
