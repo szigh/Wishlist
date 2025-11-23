@@ -11,7 +11,7 @@ namespace WishlistWeb.Controllers
     [ApiController]
     [Route("api/[controller]")]
     public class GiftController(WishlistDbContext _context, IMapper _mapper)
-        : ControllerBase
+        : BaseApiController
     {
         // GET: api/gifts
         [Authorize]
@@ -44,11 +44,8 @@ namespace WishlistWeb.Controllers
         public async Task<ActionResult<GiftReadDto>> PostGift(GiftCreateDto giftDto)
         {
             // Get the current user's ID from JWT claims
-            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
-            {
-                return Unauthorized("Invalid user token");
-            }
+            var error = ValidateAndGetUserId(out int userId);
+            if (error != null) return error;
 
             var gift = _mapper.Map<Gift>(giftDto);
             gift.UserId = userId; // Set the owner to the authenticated user
@@ -68,11 +65,8 @@ namespace WishlistWeb.Controllers
             if (gift == null) return NotFound();
 
             // Get the current user's ID from JWT claims
-            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
-            {
-                return Unauthorized("Invalid user token");
-            }
+            var error = ValidateAndGetUserId(out int userId);
+            if (error != null) return error;
 
             // Check if the user owns this gift
             if (gift.UserId != userId)
@@ -114,11 +108,8 @@ namespace WishlistWeb.Controllers
             }
 
             // Get the current user's ID from JWT claims
-            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
-            {
-                return Unauthorized("Invalid user token");
-            }
+            var error = ValidateAndGetUserId(out int userId);
+            if (error != null) return error;
 
             // Check if the user owns this gift
             if (gift.UserId != userId)
