@@ -7,7 +7,7 @@
         public string? Description { get; set; }
         public string? Link { get; set; }
         public string? Category { get; set; }
-        public int UserId { get; set; } // owner
+        // UserId is populated from JWT claims, not from request body
     }
 
     // For updating a gift

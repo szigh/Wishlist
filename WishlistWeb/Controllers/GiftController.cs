@@ -43,7 +43,15 @@ namespace WishlistWeb.Controllers
         [HttpPost]
         public async Task<ActionResult<GiftReadDto>> PostGift(GiftCreateDto giftDto)
         {
+            // Get the current user's ID from JWT claims
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+            {
+                return Unauthorized("Invalid user token");
+            }
+
             var gift = _mapper.Map<Gift>(giftDto);
+            gift.UserId = userId; // Set the owner to the authenticated user
             _context.Gifts.Add(gift);
             await _context.SaveChangesAsync();
 
@@ -58,6 +66,19 @@ namespace WishlistWeb.Controllers
         {
             var gift = await _context.Gifts.FindAsync(id);
             if (gift == null) return NotFound();
+
+            // Get the current user's ID from JWT claims
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+            {
+                return Unauthorized("Invalid user token");
+            }
+
+            // Check if the user owns this gift
+            if (gift.UserId != userId)
+            {
+                return Forbid(); // 403 Forbidden - user doesn't own this gift
+            }
 
             // Map onto the existing tracked entity
             _mapper.Map(updateDto, gift);
@@ -90,6 +111,19 @@ namespace WishlistWeb.Controllers
             if (gift == null)
             {
                 return NotFound();
+            }
+
+            // Get the current user's ID from JWT claims
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+            {
+                return Unauthorized("Invalid user token");
+            }
+
+            // Check if the user owns this gift
+            if (gift.UserId != userId)
+            {
+                return Forbid(); // 403 Forbidden - user doesn't own this gift
             }
 
             _context.Gifts.Remove(gift);

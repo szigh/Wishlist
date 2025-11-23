@@ -4,7 +4,7 @@
     public class VolunteerCreateDto
     {
         public int GiftId { get; set; }
-        public int VolunteerUserId { get; set; }
+        // VolunteerUserId is populated from JWT claims, not from request body
     }
 
     // For returning volunteer info

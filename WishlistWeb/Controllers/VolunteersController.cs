@@ -12,7 +12,16 @@ public class VolunteersController(WishlistDbContext context) : ControllerBase
     [Authorize]
     public async Task<ActionResult<IEnumerable<Volunteer>>> GetVolunteers()
     {
+        // Get the current user's ID from JWT claims
+        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+        {
+            return Unauthorized("Invalid user token");
+        }
+
+        // Only return claims where the user is the volunteer
         return await context.Volunteers
+            .Where(v => v.VolunteerUserId == userId)
             .Include(v => v.Gift)
             .Include(v => v.VolunteerUser)
             .ToListAsync();
@@ -23,12 +32,26 @@ public class VolunteersController(WishlistDbContext context) : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<Volunteer>> GetVolunteer(int id)
     {
+        // Get the current user's ID from JWT claims
+        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+        {
+            return Unauthorized("Invalid user token");
+        }
+
         var volunteer = await context.Volunteers
             .Include(v => v.Gift)
             .Include(v => v.VolunteerUser)
             .FirstOrDefaultAsync(v => v.Id == id);
 
         if (volunteer == null) return NotFound();
+
+        // Verify the user owns this claim
+        if (volunteer.VolunteerUserId != userId)
+        {
+            return Forbid(); // 403 Forbidden - user doesn't own this claim
+        }
+
         return volunteer;
     }
 
@@ -37,11 +60,31 @@ public class VolunteersController(WishlistDbContext context) : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Volunteer>> PostVolunteer(Volunteer volunteer)
     {
+        // Get the current user's ID from JWT claims
+        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+        {
+            return Unauthorized("Invalid user token");
+        }
+
+        // Auto-set the volunteer user to the authenticated user
+        volunteer.VolunteerUserId = userId;
+
+        // Check if gift exists and is not already taken
+        var gift = await context.Gifts.FindAsync(volunteer.GiftId);
+        if (gift == null)
+        {
+            return NotFound("Gift not found");
+        }
+        if (gift.IsTaken)
+        {
+            return BadRequest("This gift has already been claimed");
+        }
+
         context.Volunteers.Add(volunteer);
 
         // Mark gift as taken
-        var gift = await context.Gifts.FindAsync(volunteer.GiftId);
-        gift?.IsTaken = true;
+        gift.IsTaken = true;
 
         await context.SaveChangesAsync();
         return CreatedAtAction(nameof(GetVolunteer), new { id = volunteer.Id }, volunteer);
@@ -55,11 +98,27 @@ public class VolunteersController(WishlistDbContext context) : ControllerBase
         var volunteer = await context.Volunteers.FindAsync(id);
         if (volunteer == null) return NotFound();
 
+        // Get the current user's ID from JWT claims
+        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+        {
+            return Unauthorized("Invalid user token");
+        }
+
+        // Verify the user owns this claim
+        if (volunteer.VolunteerUserId != userId)
+        {
+            return Forbid(); // 403 Forbidden - user doesn't own this claim
+        }
+
         context.Volunteers.Remove(volunteer);
 
-        // Reset gift status if needed
+        // Reset gift status
         var gift = await context.Gifts.FindAsync(volunteer.GiftId);
-        gift?.IsTaken = false;
+        if (gift != null)
+        {
+            gift.IsTaken = false;
+        }
 
         await context.SaveChangesAsync();
         return NoContent();
