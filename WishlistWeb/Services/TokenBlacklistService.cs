@@ -14,7 +14,7 @@ namespace WishlistWeb.Services
         // ConcurrentDictionary is thread-safe for multiple simultaneous requests
         // Key: token JTI (unique token ID), Value: expiration time
         private readonly ConcurrentDictionary<string, DateTime> _blacklistedTokens = new();
-        private DateTime _lastCleanup = DateTime.UtcNow;
+        private long _lastCleanupTicks = DateTime.UtcNow.Ticks;
         private readonly TimeSpan _cleanupInterval = TimeSpan.FromHours(1);
 
         public void BlacklistToken(string tokenId, DateTime expiration)
@@ -22,7 +22,11 @@ namespace WishlistWeb.Services
             _blacklistedTokens.TryAdd(tokenId, expiration);
             
             // Periodic cleanup to prevent memory buildup
-            if (DateTime.UtcNow - _lastCleanup > _cleanupInterval)
+            // Use Interlocked.Read for thread-safe read of 64-bit value
+            var nowTicks = DateTime.UtcNow.Ticks;
+            var lastCleanupTicks = Interlocked.Read(ref _lastCleanupTicks);
+            
+            if (nowTicks - lastCleanupTicks > _cleanupInterval.Ticks)
             {
                 CleanupExpiredTokens();
             }
@@ -36,6 +40,25 @@ namespace WishlistWeb.Services
         public void CleanupExpiredTokens()
         {
             var now = DateTime.UtcNow;
+            var nowTicks = now.Ticks;
+            
+            // Read the last cleanup time immediately before the compare-exchange
+            var lastCleanupTicks = Interlocked.Read(ref _lastCleanupTicks);
+            
+            // Check if another thread already performed cleanup recently
+            if (nowTicks - lastCleanupTicks <= _cleanupInterval.Ticks)
+            {
+                return;
+            }
+            
+            // Try to claim the cleanup operation atomically
+            if (Interlocked.CompareExchange(ref _lastCleanupTicks, nowTicks, lastCleanupTicks) != lastCleanupTicks)
+            {
+                // Another thread already started cleanup
+                return;
+            }
+            
+            // Perform cleanup - only one thread will reach this point
             var expiredTokens = _blacklistedTokens
                 .Where(kvp => kvp.Value < now)
                 .Select(kvp => kvp.Key)
@@ -45,8 +68,6 @@ namespace WishlistWeb.Services
             {
                 _blacklistedTokens.TryRemove(tokenId, out _);
             }
-
-            _lastCleanup = now;
         }
     }
 }
