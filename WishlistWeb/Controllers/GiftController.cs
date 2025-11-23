@@ -73,18 +73,12 @@ namespace WishlistWeb.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutGift(int id, GiftUpdateDto updateDto)
         {
-            var gift = await _context.Gifts.FindAsync(id);
-            if (gift == null) return NotFound();
-
             // Get the current user's ID from JWT claims
             var error = ValidateAndGetUserId(out int userId);
             if (error != null) return error;
 
-            // Check if the user owns this gift
-            if (gift.UserId != userId)
-            {
-                return Forbid(); // 403 Forbidden - user doesn't own this gift
-            }
+            var gift = await _context.Gifts.FirstOrDefaultAsync(g => g.Id == id && g.UserId == userId);
+            if (gift == null) return NotFound();
 
             // Map onto the existing tracked entity
             _mapper.Map(updateDto, gift);
