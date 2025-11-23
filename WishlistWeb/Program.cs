@@ -20,14 +20,18 @@ builder.Services.AddDbContext<WishlistDbContext>(
 builder.Services.AddSingleton<ITokenBlacklistService, TokenBlacklistService>();
 
 // Configure CORS
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "http://localhost:5173") // Common React dev ports (CRA & Vite)
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
+        if (allowedOrigins != null && allowedOrigins.Length > 0)
+        {
+            policy.WithOrigins(allowedOrigins)
+                  .AllowAnyMethod()
+                  .AllowAnyHeader()
+                  .AllowCredentials();
+        }
     });
 });
 
