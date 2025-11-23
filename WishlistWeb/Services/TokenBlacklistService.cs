@@ -26,13 +26,11 @@ namespace WishlistWeb.Services
             var nowTicks = DateTime.UtcNow.Ticks;
             var lastCleanupTicks = Interlocked.Read(ref _lastCleanupTicks);
             
-            if (nowTicks - lastCleanupTicks > _cleanupInterval.Ticks)
+            // Atomically claim the cleanup operation if enough time has passed
+            if ((nowTicks - lastCleanupTicks > _cleanupInterval.Ticks) &&
+                (Interlocked.CompareExchange(ref _lastCleanupTicks, nowTicks, lastCleanupTicks) == lastCleanupTicks))
             {
-                // Atomically claim the cleanup operation
-                if (Interlocked.CompareExchange(ref _lastCleanupTicks, nowTicks, lastCleanupTicks) == lastCleanupTicks)
-                {
-                    CleanupExpiredTokens();
-                }
+                CleanupExpiredTokens();
             }
         }
 
