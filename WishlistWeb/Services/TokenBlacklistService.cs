@@ -28,7 +28,11 @@ namespace WishlistWeb.Services
             
             if (nowTicks - lastCleanupTicks > _cleanupInterval.Ticks)
             {
-                CleanupExpiredTokens();
+                // Atomically claim the cleanup operation
+                if (Interlocked.CompareExchange(ref _lastCleanupTicks, nowTicks, lastCleanupTicks) == lastCleanupTicks)
+                {
+                    CleanupExpiredTokens();
+                }
             }
         }
 
