@@ -1,0 +1,6 @@
+@WishlistWeb_HostAddress = http://localhost:5287
+
+GET {{WishlistWeb_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
