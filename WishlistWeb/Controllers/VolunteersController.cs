@@ -4,9 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using WishlistModels;
 
-[ApiController]
-[Route("api/[controller]")]
-public class VolunteersController(WishlistDbContext context) : ControllerBase
+namespace WishlistWeb.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class VolunteersController(WishlistDbContext context) : BaseApiController
 {
     // GET: api/volunteers
     [HttpGet]
@@ -14,11 +16,8 @@ public class VolunteersController(WishlistDbContext context) : ControllerBase
     public async Task<ActionResult<IEnumerable<Volunteer>>> GetVolunteers()
     {
         // Get the current user's ID from JWT claims
-        var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-        if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
-        {
-            return Unauthorized("Invalid user token");
-        }
+        var error = ValidateAndGetUserId(out int userId);
+        if (error != null) return error;
 
         // Only return claims where the user is the volunteer
         return await context.Volunteers
@@ -34,11 +33,8 @@ public class VolunteersController(WishlistDbContext context) : ControllerBase
     public async Task<ActionResult<Volunteer>> GetVolunteer(int id)
     {
         // Get the current user's ID from JWT claims
-        var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-        if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
-        {
-            return Unauthorized("Invalid user token");
-        }
+        var error = ValidateAndGetUserId(out int userId);
+        if (error != null) return error;
 
         var volunteer = await context.Volunteers
             .Include(v => v.Gift)
@@ -62,11 +58,8 @@ public class VolunteersController(WishlistDbContext context) : ControllerBase
     public async Task<ActionResult<Volunteer>> PostVolunteer(Volunteer volunteer)
     {
         // Get the current user's ID from JWT claims
-        var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-        if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
-        {
-            return Unauthorized("Invalid user token");
-        }
+        var error = ValidateAndGetUserId(out int userId);
+        if (error != null) return error;
 
         // Auto-set the volunteer user to the authenticated user
         volunteer.VolunteerUserId = userId;
@@ -100,11 +93,8 @@ public class VolunteersController(WishlistDbContext context) : ControllerBase
         if (volunteer == null) return NotFound();
 
         // Get the current user's ID from JWT claims
-        var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-        if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
-        {
-            return Unauthorized("Invalid user token");
-        }
+        var error = ValidateAndGetUserId(out int userId);
+        if (error != null) return error;
 
         // Verify the user owns this claim
         if (volunteer.VolunteerUserId != userId)
@@ -123,5 +113,6 @@ public class VolunteersController(WishlistDbContext context) : ControllerBase
 
         await context.SaveChangesAsync();
         return NoContent();
+    }
     }
 }

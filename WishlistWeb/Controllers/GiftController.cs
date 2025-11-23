@@ -12,7 +12,7 @@ namespace WishlistWeb.Controllers
     [ApiController]
     [Route("api/[controller]")]
     public class GiftController(WishlistDbContext _context, IMapper _mapper)
-        : ControllerBase
+        : BaseApiController
     {
         // Helper method to get the current user's ID from JWT claims
         private (bool Success, int UserId, ActionResult ErrorResult) GetCurrentUserId()
@@ -55,11 +55,9 @@ namespace WishlistWeb.Controllers
         [HttpPost]
         public async Task<ActionResult<GiftReadDto>> PostGift(GiftCreateDto giftDto)
         {
-            var (success, userId, errorResult) = GetCurrentUserId();
-            if (!success)
-            {
-                return errorResult;
-            }
+            // Get the current user's ID from JWT claims
+            var error = ValidateAndGetUserId(out int userId);
+            if (error != null) return error;
 
             var gift = _mapper.Map<Gift>(giftDto);
             gift.UserId = userId; // Set the owner to the authenticated user
@@ -78,11 +76,9 @@ namespace WishlistWeb.Controllers
             var gift = await _context.Gifts.FindAsync(id);
             if (gift == null) return NotFound();
 
-            var (success, userId, errorResult) = GetCurrentUserId();
-            if (!success)
-            {
-                return errorResult;
-            }
+            // Get the current user's ID from JWT claims
+            var error = ValidateAndGetUserId(out int userId);
+            if (error != null) return error;
 
             // Check if the user owns this gift
             if (gift.UserId != userId)
@@ -123,11 +119,9 @@ namespace WishlistWeb.Controllers
                 return NotFound();
             }
 
-            var (success, userId, errorResult) = GetCurrentUserId();
-            if (!success)
-            {
-                return errorResult;
-            }
+            // Get the current user's ID from JWT claims
+            var error = ValidateAndGetUserId(out int userId);
+            if (error != null) return error;
 
             // Check if the user owns this gift
             if (gift.UserId != userId)
