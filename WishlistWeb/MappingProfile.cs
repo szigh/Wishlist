@@ -19,7 +19,9 @@ namespace WishlistWeb
             // Gift mappings
             CreateMap<Gift, GiftReadDto>();
             CreateMap<GiftCreateDto, Gift>();
-            CreateMap<GiftUpdateDto, Gift>();
+            CreateMap<GiftUpdateDto, Gift>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.UserId, opt => opt.Ignore());
 
             // Volunteer mappings
             CreateMap<Volunteer, VolunteerReadDto>();
