@@ -33,10 +33,10 @@ namespace WishlistWeb.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<LoginResponseDto>> Login(LoginRequestDto request)
         {
-            // Validate input
-            if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Password))
+            var validationResult = ValidateLoginRequest(request);
+            if (validationResult != null)
             {
-                return BadRequest(new { message = "Username and password are required" });
+                return validationResult;
             }
 
             // Find user by name
@@ -71,10 +71,10 @@ namespace WishlistWeb.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<LoginResponseDto>> Register(LoginRequestDto request)
         {
-            // Validate input
-            if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Password))
+            var validationResult = ValidateLoginRequest(request);
+            if (validationResult != null)
             {
-                return BadRequest(new { message = "Username and password are required" });
+                return validationResult;
             }
 
             // Check if username already exists
@@ -135,6 +135,15 @@ namespace WishlistWeb.Controllers
             _tokenBlacklistService.BlacklistToken(tokenId, expiration);
 
             return Ok(new { message = "Logged out successfully" });
+        }
+
+        private ActionResult? ValidateLoginRequest(LoginRequestDto request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Password))
+            {
+                return BadRequest(new { message = "Username and password are required" });
+            }
+            return null;
         }
 
         private string GenerateJwtToken(User user)
