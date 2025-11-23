@@ -14,14 +14,14 @@ namespace WishlistWeb.Controllers
         : ControllerBase
     {
         // Helper method to get the current user's ID from JWT claims
-        private (bool Success, int UserId, ActionResult? ErrorResult) GetCurrentUserId()
+        private (bool Success, int UserId, ActionResult ErrorResult) GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
             {
                 return (false, 0, Unauthorized("Invalid user token"));
             }
-            return (true, userId, null);
+            return (true, userId, null!);
         }
 
         // GET: api/gifts
@@ -57,7 +57,7 @@ namespace WishlistWeb.Controllers
             var (success, userId, errorResult) = GetCurrentUserId();
             if (!success)
             {
-                return errorResult!;
+                return errorResult;
             }
 
             var gift = _mapper.Map<Gift>(giftDto);
@@ -80,7 +80,7 @@ namespace WishlistWeb.Controllers
             var (success, userId, errorResult) = GetCurrentUserId();
             if (!success)
             {
-                return errorResult!;
+                return errorResult;
             }
 
             // Check if the user owns this gift
@@ -125,7 +125,7 @@ namespace WishlistWeb.Controllers
             var (success, userId, errorResult) = GetCurrentUserId();
             if (!success)
             {
-                return errorResult!;
+                return errorResult;
             }
 
             // Check if the user owns this gift
