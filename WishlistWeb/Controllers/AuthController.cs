@@ -132,7 +132,25 @@ namespace WishlistWeb.Controllers
             var jwtAudience = _configuration["Jwt:Audience"];
             var jwtExpirationMinutes = _configuration.GetValue<int>("Jwt:ExpirationMinutes");
 
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey!));
+            // Validate all required JWT configuration values are present
+            if (string.IsNullOrEmpty(jwtKey))
+            {
+                throw new InvalidOperationException("JWT Key is not configured. Please set Jwt:Key in appsettings.json");
+            }
+            if (string.IsNullOrEmpty(jwtIssuer))
+            {
+                throw new InvalidOperationException("JWT Issuer is not configured. Please set Jwt:Issuer in appsettings.json");
+            }
+            if (string.IsNullOrEmpty(jwtAudience))
+            {
+                throw new InvalidOperationException("JWT Audience is not configured. Please set Jwt:Audience in appsettings.json");
+            }
+            if (jwtExpirationMinutes <= 0)
+            {
+                throw new InvalidOperationException("JWT ExpirationMinutes is not configured or invalid. Please set Jwt:ExpirationMinutes in appsettings.json");
+            }
+
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
