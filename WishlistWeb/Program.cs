@@ -5,7 +5,7 @@ using WishlistWeb;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddAutoMapper(cfg => {
-    cfg.LicenseKey = builder.Configuration.GetValue<string>("AutoMapperLicenseKey");
+    cfg.LicenseKey = builder.Configuration.GetValue<string>("AutomapperKey");
 }, typeof(MappingProfile));
 builder.Services.AddDbContext<WishlistDbContext>(
     options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
