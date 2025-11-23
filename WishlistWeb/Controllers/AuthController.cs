@@ -139,6 +139,11 @@ namespace WishlistWeb.Controllers
 
         private ActionResult? ValidateLoginRequest(LoginRequestDto request)
         {
+            if (request == null)
+            {
+                return BadRequest(new { message = "Request cannot be null" });
+            }
+
             if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Password))
             {
                 return BadRequest(new { message = "Username and password are required" });
