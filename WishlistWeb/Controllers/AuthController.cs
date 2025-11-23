@@ -178,7 +178,7 @@ namespace WishlistWeb.Controllers
             var jwtAudience = _configuration["Jwt:Audience"];
             var jwtExpirationMinutes = _configuration.GetValue<int>("Jwt:ExpirationMinutes");
 
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey!));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
