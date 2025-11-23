@@ -364,3 +364,5 @@ FodyWeavers.xsd
 Models/wishlist.db-wal
 
 Models/wishlist.db-shm
+
+Models/wishlist.db
