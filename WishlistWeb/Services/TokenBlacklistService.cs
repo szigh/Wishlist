@@ -22,10 +22,10 @@ namespace WishlistWeb.Services
             _blacklistedTokens.TryAdd(tokenId, expiration);
             
             // Periodic cleanup to prevent memory buildup
-            var now = DateTime.UtcNow;
-            var lastCleanup = new DateTime(Interlocked.Read(ref _lastCleanupTicks));
+            var nowTicks = DateTime.UtcNow.Ticks;
+            var lastCleanupTicks = Interlocked.Read(ref _lastCleanupTicks);
             
-            if (now - lastCleanup > _cleanupInterval)
+            if (nowTicks - lastCleanupTicks > _cleanupInterval.Ticks)
             {
                 CleanupExpiredTokens();
             }
@@ -39,18 +39,19 @@ namespace WishlistWeb.Services
         public void CleanupExpiredTokens()
         {
             var now = DateTime.UtcNow;
-            var lastCleanup = new DateTime(Interlocked.Read(ref _lastCleanupTicks));
+            var nowTicks = now.Ticks;
+            
+            // Read the last cleanup time immediately before the compare-exchange
+            var lastCleanupTicks = Interlocked.Read(ref _lastCleanupTicks);
             
             // Check if another thread already performed cleanup recently
-            if (now - lastCleanup <= _cleanupInterval)
+            if (nowTicks - lastCleanupTicks <= _cleanupInterval.Ticks)
             {
                 return;
             }
             
             // Try to claim the cleanup operation atomically
-            var expectedTicks = lastCleanup.Ticks;
-            var newTicks = now.Ticks;
-            if (Interlocked.CompareExchange(ref _lastCleanupTicks, newTicks, expectedTicks) != expectedTicks)
+            if (Interlocked.CompareExchange(ref _lastCleanupTicks, nowTicks, lastCleanupTicks) != lastCleanupTicks)
             {
                 // Another thread already started cleanup
                 return;
