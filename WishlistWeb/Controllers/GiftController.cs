@@ -4,6 +4,7 @@ using WishlistContracts.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
 using WishlistModels;
 
 namespace WishlistWeb.Controllers
@@ -44,7 +45,7 @@ namespace WishlistWeb.Controllers
         public async Task<ActionResult<GiftReadDto>> PostGift(GiftCreateDto giftDto)
         {
             // Get the current user's ID from JWT claims
-            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
             if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
             {
                 return Unauthorized("Invalid user token");
@@ -68,7 +69,7 @@ namespace WishlistWeb.Controllers
             if (gift == null) return NotFound();
 
             // Get the current user's ID from JWT claims
-            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
             if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
             {
                 return Unauthorized("Invalid user token");
@@ -114,7 +115,7 @@ namespace WishlistWeb.Controllers
             }
 
             // Get the current user's ID from JWT claims
-            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
             if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
             {
                 return Unauthorized("Invalid user token");
