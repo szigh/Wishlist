@@ -1,6 +1,7 @@
 using AutoMapper;
 using Contracts.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Models;
 
 namespace WishlistWeb.Controllers
@@ -14,10 +15,10 @@ namespace WishlistWeb.Controllers
         public async Task<ActionResult<UserReadDto>> Register(RegisterDto dto)
         {
             // Check if user already exists
-            var existingUser = context.Users.FirstOrDefault(u => u.Name == dto.Name);
+            var existingUser = await context.Users.FirstOrDefaultAsync(u => u.Name == dto.Name);
             if (existingUser != null)
             {
-                return BadRequest("User already exists");
+                return Conflict("Registration failed");
             }
 
             // Create new user
@@ -40,7 +41,7 @@ namespace WishlistWeb.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<UserReadDto>> Login(LoginDto dto)
         {
-            var user = context.Users.FirstOrDefault(u => u.Name == dto.Name);
+            var user = await context.Users.FirstOrDefaultAsync(u => u.Name == dto.Name);
             if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
             {
                 return Unauthorized("Invalid credentials");
