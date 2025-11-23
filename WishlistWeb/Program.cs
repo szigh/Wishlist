@@ -35,6 +35,7 @@ builder.Services.AddCors(options =>
 var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
 var jwtAudience = builder.Configuration["Jwt:Audience"];
+var jwtExpirationMinutes = builder.Configuration.GetValue<int>("Jwt:ExpirationMinutes");
 
 // Validate all required JWT configuration values are present
 if (string.IsNullOrEmpty(jwtKey))
@@ -48,6 +49,10 @@ if (string.IsNullOrEmpty(jwtIssuer))
 if (string.IsNullOrEmpty(jwtAudience))
 {
     throw new InvalidOperationException("JWT Audience is not configured. Please set Jwt:Audience in appsettings.json");
+}
+if (jwtExpirationMinutes <= 0)
+{
+    throw new InvalidOperationException("JWT ExpirationMinutes is not configured or invalid. Please set Jwt:ExpirationMinutes in appsettings.json");
 }
 
 builder.Services.AddAuthentication(options =>
