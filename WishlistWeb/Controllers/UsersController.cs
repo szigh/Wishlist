@@ -41,7 +41,7 @@ namespace WishlistWeb.Controllers
 
         // GET: api/users/gifts/5
         [Authorize]
-        [HttpGet("gifts/{userId}")]
+        [HttpGet("{userId}/wishlist")]
         public async Task<ActionResult<UserWishlistReadDto>> GetUsersGifts(int userId)
         {
             var user = await context.Users.Include(u => u.Gifts).FirstOrDefaultAsync(u => u.Id == userId);
