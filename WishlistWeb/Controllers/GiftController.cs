@@ -14,6 +14,17 @@ namespace WishlistWeb.Controllers
     public class GiftController(WishlistDbContext _context, IMapper _mapper)
         : ControllerBase
     {
+        // Helper method to get the current user's ID from JWT claims
+        private (bool Success, int UserId, ActionResult ErrorResult) GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+            {
+                return (false, 0, Unauthorized("Invalid user token"));
+            }
+            return (true, userId, null!);
+        }
+
         // GET: api/gifts
         [Authorize]
         [HttpGet]
@@ -44,11 +55,10 @@ namespace WishlistWeb.Controllers
         [HttpPost]
         public async Task<ActionResult<GiftReadDto>> PostGift(GiftCreateDto giftDto)
         {
-            // Get the current user's ID from JWT claims
-            var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+            var (success, userId, errorResult) = GetCurrentUserId();
+            if (!success)
             {
-                return Unauthorized("Invalid user token");
+                return errorResult;
             }
 
             var gift = _mapper.Map<Gift>(giftDto);
@@ -68,11 +78,10 @@ namespace WishlistWeb.Controllers
             var gift = await _context.Gifts.FindAsync(id);
             if (gift == null) return NotFound();
 
-            // Get the current user's ID from JWT claims
-            var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+            var (success, userId, errorResult) = GetCurrentUserId();
+            if (!success)
             {
-                return Unauthorized("Invalid user token");
+                return errorResult;
             }
 
             // Check if the user owns this gift
@@ -114,11 +123,10 @@ namespace WishlistWeb.Controllers
                 return NotFound();
             }
 
-            // Get the current user's ID from JWT claims
-            var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+            var (success, userId, errorResult) = GetCurrentUserId();
+            if (!success)
             {
-                return Unauthorized("Invalid user token");
+                return errorResult;
             }
 
             // Check if the user owns this gift
