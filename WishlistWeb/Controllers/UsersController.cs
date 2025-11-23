@@ -39,11 +39,11 @@ namespace WishlistWeb.Controllers
 
         // GET: api/users/gifts/5
         [HttpGet("gifts/{id}")]
-        public async Task<ActionResult<UserReadDto>> GetUsersGifts(int id)
+        public async Task<ActionResult<UserWishlistReadDto>> GetUsersGifts(int id)
         {
-            var user = await context.Users.Include(u => u.Gifts).FirstOrDefaultAsync(u => u.Id == id);
+            var user = await context.Users.Include(u => u.Gifts).FirstAsync(u => u.Id == id);
             if (user == null) return NotFound();
-            return _mapper.Map<UserReadDto>(user);
+            return _mapper.Map<UserWishlistReadDto>(user);
         }
 
         // POST: api/users
