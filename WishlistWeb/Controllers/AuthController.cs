@@ -14,12 +14,10 @@ namespace WishlistWeb.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController(
-        WishlistDbContext _context,
-        IConfiguration _configuration,
-        ITokenBlacklistService _tokenBlacklistService) : ControllerBase
+    public class AuthController(WishlistDbContext _context, IConfiguration _configuration, ITokenBlacklistService _tokenBlacklistService) 
+        : ControllerBase
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(AuthController));=
+        private static readonly ILog _logger = LogManager.GetLogger(typeof(AuthController));
 
         // POST: api/auth/login
         [HttpPost("login")]
