@@ -8,34 +8,27 @@ using System.Text;
 using WishlistContracts.DTOs;
 using WishlistModels;
 using WishlistWeb.Services;
+using log4net;
 
 namespace WishlistWeb.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController : ControllerBase
+    public class AuthController(WishlistDbContext _context, IConfiguration _configuration, ITokenBlacklistService _tokenBlacklistService) 
+        : ControllerBase
     {
-        private readonly WishlistDbContext _context;
-        private readonly IConfiguration _configuration;
-        private readonly ITokenBlacklistService _tokenBlacklistService;
-
-        public AuthController(
-            WishlistDbContext context,
-            IConfiguration configuration,
-            ITokenBlacklistService tokenBlacklistService)
-        {
-            _context = context;
-            _configuration = configuration;
-            _tokenBlacklistService = tokenBlacklistService;
-        }
+        private static readonly ILog _logger = LogManager.GetLogger(typeof(AuthController));
 
         // POST: api/auth/login
         [HttpPost("login")]
         public async Task<ActionResult<LoginResponseDto>> Login(LoginRequestDto request)
         {
+            _logger.Info($"Login attempt for user: {request?.Name}");
+
             var validationResult = ValidateLoginRequest(request);
             if (validationResult != null)
             {
+                _logger.Warn($"Login validation failed for user: {request?.Name}");
                 return validationResult;
             }
 
@@ -45,6 +38,7 @@ namespace WishlistWeb.Controllers
 
             if (user == null)
             {
+                _logger.Warn($"Login failed: User not found - {request.Name}");
                 return Unauthorized(new { message = "Invalid username or password" });
             }
 
@@ -52,12 +46,14 @@ namespace WishlistWeb.Controllers
             bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
             if (!isPasswordValid)
             {
+                _logger.Warn($"Login failed: Invalid password for user - {request.Name}");
                 return Unauthorized(new { message = "Invalid username or password" });
             }
 
             // Generate JWT token
             var token = GenerateJwtToken(user);
 
+            _logger.Info($"Login successful for user: {request.Name} (ID: {user.Id})");
             return Ok(new LoginResponseDto
             {
                 Token = token,
@@ -71,9 +67,12 @@ namespace WishlistWeb.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<LoginResponseDto>> Register(LoginRequestDto request)
         {
+            _logger.Info($"Registration attempt for user: {request?.Name}");
+
             var validationResult = ValidateLoginRequest(request);
             if (validationResult != null)
             {
+                _logger.Warn($"Registration validation failed for user: {request?.Name}");
                 return validationResult;
             }
 
@@ -83,6 +82,7 @@ namespace WishlistWeb.Controllers
 
             if (existingUser != null)
             {
+                _logger.Warn($"Registration failed: Username already exists - {request.Name}");
                 return BadRequest(new { message = "Username already exists" });
             }
 
@@ -100,6 +100,7 @@ namespace WishlistWeb.Controllers
             // Generate JWT token and auto-login
             var token = GenerateJwtToken(user);
 
+            _logger.Info($"Registration successful for user: {request.Name} (ID: {user.Id})");
             return Ok(new LoginResponseDto
             {
                 Token = token,
@@ -114,10 +115,14 @@ namespace WishlistWeb.Controllers
         [HttpPost("logout")]
         public IActionResult Logout()
         {
+            var userName = User.FindFirst(JwtRegisteredClaimNames.Name)?.Value;
+            _logger.Info($"Logout attempt for user: {userName}");
+
             // Extract token JTI (unique ID) from claims
             var tokenId = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
             if (tokenId == null)
             {
+                _logger.Warn($"Logout failed: Invalid token for user - {userName}");
                 return BadRequest(new { message = "Invalid token" });
             }
 
@@ -125,6 +130,7 @@ namespace WishlistWeb.Controllers
             var expClaim = User.FindFirst(JwtRegisteredClaimNames.Exp)?.Value;
             if (expClaim == null)
             {
+                _logger.Warn($"Logout failed: Invalid token expiration for user - {userName}");
                 return BadRequest(new { message = "Invalid token expiration" });
             }
 
@@ -134,6 +140,7 @@ namespace WishlistWeb.Controllers
             // Blacklist the token
             _tokenBlacklistService.BlacklistToken(tokenId, expiration);
 
+            _logger.Info($"Logout successful for user: {userName}");
             return Ok(new { message = "Logged out successfully" });
         }
 
@@ -197,6 +204,7 @@ namespace WishlistWeb.Controllers
                 signingCredentials: credentials
             );
 
+            _logger.Debug($"Generated JWT token for user: {user.Name} (ID: {user.Id})");
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
