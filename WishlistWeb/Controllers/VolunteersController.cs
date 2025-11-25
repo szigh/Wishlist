@@ -91,9 +91,17 @@ namespace WishlistWeb.Controllers
             // Mark gift as taken
             gift.IsTaken = true;
 
-            await _context.SaveChangesAsync();
-            _logger.Info($"Volunteer created successfully - ID: {entity.Id}, Gift ID: {entity.GiftId}");
-            return CreatedAtAction(nameof(GetVolunteer), new { id = entity.Id }, entity);
+            try
+            {
+                await _context.SaveChangesAsync();
+                _logger.Info($"Volunteer created successfully - ID: {entity.Id}, Gift ID: {entity.GiftId}");
+                return CreatedAtAction(nameof(GetVolunteer), new { id = entity.Id }, entity);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                _logger.Warn($"Gift was claimed concurrently - ID: {volunteer.GiftId}");
+                return BadRequest("This gift has already been claimed by someone else.");
+            }
         }
 
         // DELETE: api/volunteers/5
