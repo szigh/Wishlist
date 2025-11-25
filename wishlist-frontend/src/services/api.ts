@@ -92,21 +92,21 @@ class ApiClient {
 
   // Gift endpoints
   async getGifts(): Promise<Gift[]> {
-    const response = await fetch(`${API_BASE_URL}/gifts`, {
+    const response = await fetch(`${API_BASE_URL}/gift`, {
       headers: this.getAuthHeaders()
     });
     return this.handleResponse<Gift[]>(response);
   }
 
   async getGift(id: number): Promise<Gift> {
-    const response = await fetch(`${API_BASE_URL}/gifts/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/gift/${id}`, {
       headers: this.getAuthHeaders()
     });
     return this.handleResponse<Gift>(response);
   }
 
   async createGift(gift: GiftCreate): Promise<Gift> {
-    const response = await fetch(`${API_BASE_URL}/gifts`, {
+    const response = await fetch(`${API_BASE_URL}/gift`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(gift)
@@ -115,7 +115,7 @@ class ApiClient {
   }
 
   async updateGift(id: number, gift: GiftUpdate): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/gifts/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/gift/${id}`, {
       method: 'PUT',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(gift)
@@ -124,7 +124,7 @@ class ApiClient {
   }
 
   async deleteGift(id: number): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/gifts/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/gift/${id}`, {
       method: 'DELETE',
       headers: this.getAuthHeaders()
     });
