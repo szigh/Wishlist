@@ -91,14 +91,15 @@ namespace WishlistWeb.Controllers
                 return BadRequest("This gift has already been claimed");
             }
 
-            _context.Volunteers.Add(new Volunteer { GiftId = volunteer.GiftId, VolunteerUserId = userId});
+            Volunteer entity = new() { GiftId = volunteer.GiftId, VolunteerUserId = userId };
+            _context.Volunteers.Add(entity);
 
             // Mark gift as taken
             gift.IsTaken = true;
 
             await _context.SaveChangesAsync();
-            _logger.Info($"Volunteer created successfully - ID: {volunteer.Id}, Gift ID: {volunteer.GiftId}");
-            return CreatedAtAction(nameof(GetVolunteer), new { id = volunteer.Id }, volunteer);
+            _logger.Info($"Volunteer created successfully - ID: {entity.Id}, Gift ID: {entity.GiftId}");
+            return CreatedAtAction(nameof(GetVolunteer), new { id = entity.Id }, entity);
         }
 
         // DELETE: api/volunteers/5
