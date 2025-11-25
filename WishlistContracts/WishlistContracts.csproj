@@ -7,4 +7,8 @@
     <RootNamespace>WishlistContracts</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="log4net" Version="3.0.1" />
+  </ItemGroup>
+
 </Project>
