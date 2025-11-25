@@ -4,9 +4,10 @@ class Logger {
   private isDevelopment = import.meta.env.DEV;
   private minLevel: LogLevel = this.isDevelopment ? 'debug' : 'warn';
 
+  private static readonly levels: LogLevel[] = ['debug', 'info', 'warn', 'error'];
+
   private shouldLog(level: LogLevel): boolean {
-    const levels: LogLevel[] = ['debug', 'info', 'warn', 'error'];
-    return levels.indexOf(level) >= levels.indexOf(this.minLevel);
+    return Logger.levels.indexOf(level) >= Logger.levels.indexOf(this.minLevel);
   }
 
   debug(message: string, ...args: unknown[]): void {
