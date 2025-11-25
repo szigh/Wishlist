@@ -11,7 +11,7 @@ import type {
   VolunteerCreate 
 } from '../types';
 
-const API_BASE_URL = 'http://localhost:5287/api';
+const API_BASE_URL = 'https://localhost:7059/api';
 
 class ApiClient {
   private getAuthHeaders(): HeadersInit {
