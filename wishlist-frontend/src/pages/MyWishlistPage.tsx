@@ -19,11 +19,11 @@ export function MyWishlistPage() {
   const [category, setCategory] = useState('');
 
   const loadMyGifts = useCallback(async () => {
+    if (!user?.id) return;
+    
     try {
-      const allGifts = await apiClient.getGifts();
-      // Filter to only show current user's gifts
-      const myGifts = allGifts.filter(g => g.userId === user?.id);
-      setGifts(myGifts);
+      const userWithWishlist = await apiClient.getUserWishlist(user.id);
+      setGifts(userWithWishlist.gifts);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load gifts');
     } finally {

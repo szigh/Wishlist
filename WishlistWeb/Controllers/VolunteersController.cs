@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WishlistContracts.DTOs;
 using WishlistModels;
 
 namespace WishlistWeb.Controllers
@@ -47,14 +48,13 @@ namespace WishlistWeb.Controllers
     // POST: api/volunteers
     [Authorize]
     [HttpPost]
-    public async Task<ActionResult<Volunteer>> PostVolunteer(Volunteer volunteer)
+    public async Task<ActionResult<Volunteer>> PostVolunteer(VolunteerCreateDto volunteer)
     {
         // Get the current user's ID from JWT claims
         var error = ValidateAndGetUserId(out int userId);
         if (error != null) return error;
 
         // Auto-set the volunteer user to the authenticated user
-        volunteer.VolunteerUserId = userId;
 
         // Check if gift exists and is not already taken
         var gift = await context.Gifts.FindAsync(volunteer.GiftId);
@@ -67,13 +67,14 @@ namespace WishlistWeb.Controllers
             return BadRequest("This gift has already been claimed");
         }
 
-        context.Volunteers.Add(volunteer);
+        Volunteer entity = new() { VolunteerUserId = userId, GiftId = gift.Id };
+        context.Volunteers.Add(entity);
 
         // Mark gift as taken
         gift.IsTaken = true;
 
         await context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetVolunteer), new { id = volunteer.Id }, volunteer);
+        return CreatedAtAction(nameof(GetVolunteer), new { id = entity.Id }, entity);
     }
 
     // DELETE: api/volunteers/5
