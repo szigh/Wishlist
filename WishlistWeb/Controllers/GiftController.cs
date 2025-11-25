@@ -11,17 +11,9 @@ namespace WishlistWeb.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class GiftController : BaseApiController
+    public class GiftController(WishlistDbContext _context, IMapper _mapper) : BaseApiController
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(GiftController));
-        private readonly WishlistDbContext _context;
-        private readonly IMapper _mapper;
-
-        public GiftController(WishlistDbContext context, IMapper mapper)
-        {
-            _context = context;
-            _mapper = mapper;
-        }
 
         // GET: api/gifts
         [Authorize]

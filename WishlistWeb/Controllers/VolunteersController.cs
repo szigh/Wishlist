@@ -9,15 +9,9 @@ namespace WishlistWeb.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class VolunteersController : BaseApiController
+    public class VolunteersController(WishlistDbContext _context) : BaseApiController
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(VolunteersController));
-        private readonly WishlistDbContext _context;
-
-        public VolunteersController(WishlistDbContext context)
-        {
-            _context = context;
-        }
 
         // GET: api/volunteers
         [HttpGet]

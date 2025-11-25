@@ -11,17 +11,9 @@ namespace WishlistWeb.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UsersController : ControllerBase
+    public class UsersController(WishlistDbContext _context, IMapper _mapper) : ControllerBase
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(UsersController));
-        private readonly WishlistDbContext _context;
-        private readonly IMapper _mapper;
-
-        public UsersController(WishlistDbContext context, IMapper mapper)
-        {
-            _context = context;
-            _mapper = mapper;
-        }
 
         // GET: api/users
         [Authorize]

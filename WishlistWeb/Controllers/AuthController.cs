@@ -14,22 +14,12 @@ namespace WishlistWeb.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController : ControllerBase
+    public class AuthController(
+        WishlistDbContext _context,
+        IConfiguration _configuration,
+        ITokenBlacklistService _tokenBlacklistService) : ControllerBase
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof(AuthController));
-        private readonly WishlistDbContext _context;
-        private readonly IConfiguration _configuration;
-        private readonly ITokenBlacklistService _tokenBlacklistService;
-
-        public AuthController(
-            WishlistDbContext context,
-            IConfiguration configuration,
-            ITokenBlacklistService tokenBlacklistService)
-        {
-            _context = context;
-            _configuration = configuration;
-            _tokenBlacklistService = tokenBlacklistService;
-        }
+        private static readonly ILog _logger = LogManager.GetLogger(typeof(AuthController));=
 
         // POST: api/auth/login
         [HttpPost("login")]
