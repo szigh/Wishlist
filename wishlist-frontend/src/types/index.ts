@@ -64,4 +64,5 @@ export interface Volunteer {
 
 export interface VolunteerCreate {
   giftId: number;
+  volunteerUserId: number;
 }

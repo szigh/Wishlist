@@ -34,8 +34,10 @@ export function WishlistPage() {
       return;
     }
 
+    if (!currentUser) return;
+
     try {
-      await apiClient.claimGift({ giftId: gift.id });
+      await apiClient.claimGift({ giftId: gift.id, volunteerUserId: currentUser.id });
       // Reload wishlist to see updated status
       if (userId) {
         await loadWishlist(parseInt(userId));
