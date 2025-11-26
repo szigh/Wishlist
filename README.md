@@ -128,7 +128,7 @@ Wishlist/
 
 - Password hashing with BCrypt
 - JWT tokens with 15-minute expiration
-- Token blacklisting on logout
+- Logout is handled on the frontend (tokens expire automatically after 15 minutes)
 - Role-based authorization (admin)
 - User ownership validation (users can only modify their own resources)
 - Auto-population of user IDs from JWT claims
