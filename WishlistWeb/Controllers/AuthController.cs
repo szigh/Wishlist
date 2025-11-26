@@ -7,14 +7,13 @@ using System.Security.Claims;
 using System.Text;
 using WishlistContracts.DTOs;
 using WishlistModels;
-using WishlistWeb.Services;
 using log4net;
 
 namespace WishlistWeb.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController(WishlistDbContext _context, IConfiguration _configuration, ITokenBlacklistService _tokenBlacklistService) 
+    public class AuthController(WishlistDbContext _context, IConfiguration _configuration) 
         : ControllerBase
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(AuthController));
@@ -117,34 +116,11 @@ namespace WishlistWeb.Controllers
         {
             var userName = User.FindFirst(JwtRegisteredClaimNames.Name)?.Value;
             _logger.Info($"Logout attempt for user: {userName}");
-
-            // Extract token JTI (unique ID) from claims
-            var tokenId = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
-            if (tokenId == null)
-            {
-                _logger.Warn($"Logout failed: Invalid token for user - {userName}");
-                return BadRequest(new { message = "Invalid token" });
-            }
-
-            // Get token expiration from claims
-            var expClaim = User.FindFirst(JwtRegisteredClaimNames.Exp)?.Value;
-            if (expClaim == null)
-            {
-                _logger.Warn($"Logout failed: Invalid token expiration for user - {userName}");
-                return BadRequest(new { message = "Invalid token expiration" });
-            }
-
-            // Convert Unix timestamp to DateTime
-            var expiration = DateTimeOffset.FromUnixTimeSeconds(long.Parse(expClaim)).UtcDateTime;
-
-            // Blacklist the token
-            _tokenBlacklistService.BlacklistToken(tokenId, expiration);
-
-            _logger.Info($"Logout successful for user: {userName}");
+            //logout is handled in front end
             return Ok(new { message = "Logged out successfully" });
         }
 
-        private ActionResult? ValidateLoginRequest(LoginRequestDto request)
+        private ActionResult? ValidateLoginRequest(LoginRequestDto? request)
         {
             if (request == null)
             {

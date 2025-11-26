@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WishlistModels;
 using WishlistWeb;
-using WishlistWeb.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -15,9 +14,6 @@ builder.Services.AddAutoMapper(cfg =>
 }, typeof(MappingProfile));
 builder.Services.AddDbContext<WishlistDbContext>(
     options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// Register token blacklist service as singleton (shared across all requests)
-builder.Services.AddSingleton<ITokenBlacklistService, TokenBlacklistService>();
 
 // Configure CORS
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
@@ -72,24 +68,6 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = jwtIssuer,
         ValidAudience = jwtAudience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
-    };
-
-    // Check if token is blacklisted
-    options.Events = new JwtBearerEvents
-    {
-        OnTokenValidated = context =>
-        {
-            var blacklistService = context.HttpContext.RequestServices
-                .GetRequiredService<ITokenBlacklistService>();
-
-            var tokenId = context.Principal?.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
-            if (tokenId != null && blacklistService.IsTokenBlacklisted(tokenId))
-            {
-                context.Fail("Token has been revoked");
-            }
-
-            return Task.CompletedTask;
-        }
     };
 });
 
