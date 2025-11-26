@@ -84,7 +84,7 @@ The frontend will be available at `http://localhost:5173`
 
 - `POST /api/auth/register` - Register a new user
 - `POST /api/auth/login` - Login and receive JWT token
-- `POST /api/auth/logout` - Logout and blacklist token
+- `POST /api/auth/logout` - Logout (handled on frontend only)
 
 ### Users
 
