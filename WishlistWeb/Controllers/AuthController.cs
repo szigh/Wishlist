@@ -116,7 +116,7 @@ namespace WishlistWeb.Controllers
         {
             var userName = User.FindFirst(JwtRegisteredClaimNames.Name)?.Value;
             _logger.Info($"Logout attempt for user: {userName}");
-            //logout is handled in front end
+            // logout is handled in frontend
             return Ok(new { message = "Logged out successfully" });
         }
 
