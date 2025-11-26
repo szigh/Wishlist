@@ -4,7 +4,7 @@ A full-stack wishlist application where users can create and manage their gift w
 
 ## Features
 
-- **User Authentication**: Secure JWT-based authentication with token blacklisting
+- **User Authentication**: Secure JWT-based authentication (logout is handled on the frontend)
 - **Personal Wishlists**: Users can create, edit, and delete gifts on their own wishlist
 - **Browse Wishlists**: View other users' wishlists to see what they want
 - **Gift Claims**: Volunteer to buy gifts from others' wishlists (claims are visible only to you)
@@ -84,7 +84,7 @@ The frontend will be available at `http://localhost:5173`
 
 - `POST /api/auth/register` - Register a new user
 - `POST /api/auth/login` - Login and receive JWT token
-- `POST /api/auth/logout` - Logout and blacklist token
+- `POST /api/auth/logout` - Logout (handled on frontend only)
 
 ### Users
 
@@ -128,7 +128,7 @@ Wishlist/
 
 - Password hashing with BCrypt
 - JWT tokens with 15-minute expiration
-- Token blacklisting on logout
+- Logout is handled on the frontend (tokens expire automatically after 15 minutes)
 - Role-based authorization (admin)
 - User ownership validation (users can only modify their own resources)
 - Auto-population of user IDs from JWT claims
