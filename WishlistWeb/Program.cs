@@ -6,21 +6,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
-using log4net;
-using log4net.Config;
-using System.Reflection;
-
-// Configure log4net
-try
-{
-    var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
-    XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
-}
-catch (Exception ex)
-{
-    Console.Error.WriteLine($"Failed to configure log4net: {ex.Message}");
-    throw;
-}
 
 var builder = WebApplication.CreateBuilder(args);
 
