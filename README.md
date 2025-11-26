@@ -4,7 +4,7 @@ A full-stack wishlist application where users can create and manage their gift w
 
 ## Features
 
-- **User Authentication**: Secure JWT-based authentication with token blacklisting
+- **User Authentication**: Secure JWT-based authentication (logout is handled on the frontend)
 - **Personal Wishlists**: Users can create, edit, and delete gifts on their own wishlist
 - **Browse Wishlists**: View other users' wishlists to see what they want
 - **Gift Claims**: Volunteer to buy gifts from others' wishlists (claims are visible only to you)
