@@ -52,7 +52,7 @@ namespace WishlistWeb.IntegrationTests
 
             // Register first time
             await client.PostAsJsonAsync("/api/auth/register", request);
-            Thread.Sleep(1000);
+            
             // Act - try to register again with same username
             var response = await client.PostAsJsonAsync("/api/auth/register", request);
 
