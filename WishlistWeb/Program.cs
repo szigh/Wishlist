@@ -12,8 +12,13 @@ builder.Services.AddAutoMapper(cfg =>
 {
     cfg.LicenseKey = builder.Configuration.GetValue<string>("AutomapperKey");
 }, typeof(MappingProfile));
-builder.Services.AddDbContext<WishlistDbContext>(
-    options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Skip DbContext registration if running integration tests
+if (Environment.GetEnvironmentVariable("INTEGRATION_TEST") != "true")
+{
+    builder.Services.AddDbContext<WishlistDbContext>(
+        options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+}
 
 // Configure CORS
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
@@ -98,3 +103,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+// Make the implicit Program class accessible for testing
+public partial class Program { }
