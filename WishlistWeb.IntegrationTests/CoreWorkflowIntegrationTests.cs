@@ -200,30 +200,4 @@ namespace WishlistWeb.IntegrationTests
         }
     }
 
-    // Helper class to deserialize Volunteer response (matching the API model)
-    public class Volunteer
-    {
-        public int Id { get; set; }
-        public int GiftId { get; set; }
-        public int VolunteerUserId { get; set; }
-        public Gift? Gift { get; set; }
-        public User? VolunteerUser { get; set; }
-    }
-
-    public class Gift
-    {
-        public int Id { get; set; }
-        public string Title { get; set; } = string.Empty;
-        public string? Description { get; set; }
-        public string? Link { get; set; }
-        public string? Category { get; set; }
-        public bool IsTaken { get; set; }
-        public int UserId { get; set; }
-    }
-
-    public class User
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-    }
 }
