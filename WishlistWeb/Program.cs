@@ -13,12 +13,8 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.LicenseKey = builder.Configuration.GetValue<string>("AutomapperKey");
 }, typeof(MappingProfile));
 
-// Skip DbContext registration if running integration tests
-if (Environment.GetEnvironmentVariable("INTEGRATION_TEST") != "true")
-{
-    builder.Services.AddDbContext<WishlistDbContext>(
-        options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
-}
+builder.Services.AddDbContext<WishlistDbContext>(
+    options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Configure CORS
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();

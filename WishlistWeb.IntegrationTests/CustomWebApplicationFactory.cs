@@ -13,17 +13,27 @@ namespace WishlistWeb.IntegrationTests
     {
         // Static field to ensure the same database name is used across all requests
         private static readonly string _databaseName = $"InMemoryTestDb_{Guid.NewGuid()}";
-        
-        public CustomWebApplicationFactory()
-        {
-            // Set environment variable to skip SQLite registration in Program.cs
-            Environment.SetEnvironmentVariable("INTEGRATION_TEST", "true");
-        }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.ConfigureTestServices(services =>
             {
+                // Remove the existing DbContext registration from Program.cs
+                var descriptor = services.SingleOrDefault(
+                    d => d.ServiceType == typeof(DbContextOptions<WishlistDbContext>));
+                if (descriptor != null)
+                {
+                    services.Remove(descriptor);
+                }
+
+                // Also remove the DbContext itself to ensure clean replacement
+                var dbContextDescriptor = services.SingleOrDefault(
+                    d => d.ServiceType == typeof(WishlistDbContext));
+                if (dbContextDescriptor != null)
+                {
+                    services.Remove(dbContextDescriptor);
+                }
+
                 // Use the same database name for all requests in this factory instance
                 services.AddDbContext<WishlistDbContext>(options =>
                 {
@@ -42,16 +52,6 @@ namespace WishlistWeb.IntegrationTests
             db.Database.EnsureCreated();
 
             return host;
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                // Clean up environment variable
-                Environment.SetEnvironmentVariable("INTEGRATION_TEST", null);
-            }
-            base.Dispose(disposing);
         }
     }
 }
