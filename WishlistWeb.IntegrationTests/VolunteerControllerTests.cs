@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using WishlistContracts.DTOs;
+using WishlistModels;
 using Xunit;
 
 namespace WishlistWeb.IntegrationTests
@@ -15,31 +16,14 @@ namespace WishlistWeb.IntegrationTests
             _client = factory.CreateClient();
         }
 
-        private async Task<(string token, int userId)> RegisterAndLoginUser(string username, string password)
-        {
-            var request = new LoginRequestDto { Name = username, Password = password };
-            var response = await _client.PostAsJsonAsync("/api/auth/register", request);
-            var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponseDto>();
-            return (loginResponse!.Token, loginResponse.UserId);
-        }
-
-        private async Task<int> CreateGiftForUser(string token, string giftTitle)
-        {
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            var giftDto = new GiftCreateDto { Title = giftTitle };
-            var response = await _client.PostAsJsonAsync("/api/gift", giftDto);
-            var gift = await response.Content.ReadFromJsonAsync<GiftReadDto>();
-            return gift!.Id;
-        }
-
         [Fact]
         public async Task ClaimGift_WithValidGift_ShouldSucceed()
         {
             // Arrange
-            var (ownerToken, _) = await RegisterAndLoginUser("GiftOwner1", "password123");
-            var giftId = await CreateGiftForUser(ownerToken, "Claimable Gift");
+            var (ownerToken, _) = await _client.RegisterAndLoginUser("GiftOwner1", "password123");
+            var giftId = await _client.CreateGiftForUser(ownerToken, "Claimable Gift");
 
-            var (volunteerToken, volunteerId) = await RegisterAndLoginUser("Volunteer1", "password123");
+            var (volunteerToken, volunteerId) = await _client.RegisterAndLoginUser("Volunteer1", "password123");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", volunteerToken);
 
             var claimDto = new VolunteerCreateDto { GiftId = giftId };
@@ -59,17 +43,17 @@ namespace WishlistWeb.IntegrationTests
         public async Task ClaimGift_AlreadyClaimed_ShouldReturnBadRequest()
         {
             // Arrange
-            var (ownerToken, _) = await RegisterAndLoginUser("GiftOwner2", "password123");
-            var giftId = await CreateGiftForUser(ownerToken, "Already Claimed Gift");
+            var (ownerToken, _) = await _client.RegisterAndLoginUser("GiftOwner2", "password123");
+            var giftId = await _client.CreateGiftForUser(ownerToken, "Already Claimed Gift");
 
             // First volunteer claims
-            var (volunteer1Token, _) = await RegisterAndLoginUser("Volunteer2", "password123");
+            var (volunteer1Token, _) = await _client.RegisterAndLoginUser("Volunteer2", "password123");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", volunteer1Token);
             var claimDto = new VolunteerCreateDto { GiftId = giftId };
             await _client.PostAsJsonAsync("/api/volunteers", claimDto);
 
             // Second volunteer tries to claim
-            var (volunteer2Token, _) = await RegisterAndLoginUser("Volunteer3", "password123");
+            var (volunteer2Token, _) = await _client.RegisterAndLoginUser("Volunteer3", "password123");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", volunteer2Token);
 
             // Act
@@ -83,17 +67,17 @@ namespace WishlistWeb.IntegrationTests
         public async Task GetVolunteers_ShouldReturnOnlyMyClaimedGifts()
         {
             // Arrange
-            var (ownerToken, _) = await RegisterAndLoginUser("GiftOwner3", "password123");
-            var gift1Id = await CreateGiftForUser(ownerToken, "Gift 1");
-            var gift2Id = await CreateGiftForUser(ownerToken, "Gift 2");
+            var (ownerToken, _) = await _client.RegisterAndLoginUser("GiftOwner3", "password123");
+            var gift1Id = await _client.CreateGiftForUser(ownerToken, "Gift 1");
+            var gift2Id = await _client.CreateGiftForUser(ownerToken, "Gift 2");
 
             // Volunteer claims gift1
-            var (volunteerToken, _) = await RegisterAndLoginUser("Volunteer4", "password123");
+            var (volunteerToken, _) = await _client.RegisterAndLoginUser("Volunteer4", "password123");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", volunteerToken);
             await _client.PostAsJsonAsync("/api/volunteers", new VolunteerCreateDto { GiftId = gift1Id });
 
             // Another volunteer claims gift2
-            var (volunteer2Token, _) = await RegisterAndLoginUser("Volunteer5", "password123");
+            var (volunteer2Token, _) = await _client.RegisterAndLoginUser("Volunteer5", "password123");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", volunteer2Token);
             await _client.PostAsJsonAsync("/api/volunteers", new VolunteerCreateDto { GiftId = gift2Id });
 
@@ -113,10 +97,10 @@ namespace WishlistWeb.IntegrationTests
         public async Task DeleteVolunteer_AsClaimOwner_ShouldSucceedAndResetGiftStatus()
         {
             // Arrange
-            var (ownerToken, _) = await RegisterAndLoginUser("GiftOwner4", "password123");
-            var giftId = await CreateGiftForUser(ownerToken, "Unclaim Test Gift");
+            var (ownerToken, _) = await _client.RegisterAndLoginUser("GiftOwner4", "password123");
+            var giftId = await _client.CreateGiftForUser(ownerToken, "Unclaim Test Gift");
 
-            var (volunteerToken, _) = await RegisterAndLoginUser("Volunteer6", "password123");
+            var (volunteerToken, _) = await _client.RegisterAndLoginUser("Volunteer6", "password123");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", volunteerToken);
             
             var claimResponse = await _client.PostAsJsonAsync("/api/volunteers", new VolunteerCreateDto { GiftId = giftId });
@@ -138,17 +122,17 @@ namespace WishlistWeb.IntegrationTests
         public async Task DeleteVolunteer_AsNonClaimOwner_ShouldReturnNotFound()
         {
             // Arrange
-            var (ownerToken, _) = await RegisterAndLoginUser("GiftOwner5", "password123");
-            var giftId = await CreateGiftForUser(ownerToken, "Gift for unauthorized unclaim");
+            var (ownerToken, _) = await _client.RegisterAndLoginUser("GiftOwner5", "password123");
+            var giftId = await _client.CreateGiftForUser(ownerToken, "Gift for unauthorized unclaim");
 
             // First volunteer claims
-            var (volunteer1Token, _) = await RegisterAndLoginUser("Volunteer7", "password123");
+            var (volunteer1Token, _) = await _client.RegisterAndLoginUser("Volunteer7", "password123");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", volunteer1Token);
             var claimResponse = await _client.PostAsJsonAsync("/api/volunteers", new VolunteerCreateDto { GiftId = giftId });
             var volunteer = await claimResponse.Content.ReadFromJsonAsync<Volunteer>();
 
             // Different volunteer tries to unclaim
-            var (volunteer2Token, _) = await RegisterAndLoginUser("Volunteer8", "password123");
+            var (volunteer2Token, _) = await _client.RegisterAndLoginUser("Volunteer8", "password123");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", volunteer2Token);
 
             // Act
@@ -162,7 +146,7 @@ namespace WishlistWeb.IntegrationTests
         public async Task ClaimGift_NonExistentGift_ShouldReturnNotFound()
         {
             // Arrange
-            var (volunteerToken, _) = await RegisterAndLoginUser("Volunteer9", "password123");
+            var (volunteerToken, _) = await _client.RegisterAndLoginUser("Volunteer9", "password123");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", volunteerToken);
 
             var claimDto = new VolunteerCreateDto { GiftId = 99999 }; // Non-existent ID

@@ -15,19 +15,11 @@ namespace WishlistWeb.IntegrationTests
             _client = factory.CreateClient();
         }
 
-        private async Task<(string token, int userId)> RegisterAndLoginUser(string username, string password)
-        {
-            var request = new LoginRequestDto { Name = username, Password = password };
-            var response = await _client.PostAsJsonAsync("/api/auth/register", request);
-            var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponseDto>();
-            return (loginResponse!.Token, loginResponse.UserId);
-        }
-
         [Fact]
         public async Task CreateGift_WithValidData_ShouldSucceed()
         {
             // Arrange
-            var (token, userId) = await RegisterAndLoginUser("GiftUser1", "password123");
+            var (token, userId) = await _client.RegisterAndLoginUser("GiftUser1", "password123");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var giftDto = new GiftCreateDto
@@ -52,7 +44,7 @@ namespace WishlistWeb.IntegrationTests
         public async Task GetGift_WithValidId_ShouldReturnGift()
         {
             // Arrange
-            var (token, _) = await RegisterAndLoginUser("GiftUser2", "password123");
+            var (token, _) = await _client.RegisterAndLoginUser("GiftUser2", "password123");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var giftDto = new GiftCreateDto { Title = "Retrievable Gift" };
@@ -73,7 +65,7 @@ namespace WishlistWeb.IntegrationTests
         public async Task UpdateGift_AsOwner_ShouldSucceed()
         {
             // Arrange
-            var (token, _) = await RegisterAndLoginUser("GiftUser3", "password123");
+            var (token, _) = await _client.RegisterAndLoginUser("GiftUser3", "password123");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var giftDto = new GiftCreateDto { Title = "Original Title" };
@@ -104,7 +96,7 @@ namespace WishlistWeb.IntegrationTests
         public async Task UpdateGift_AsNonOwner_ShouldReturnNotFound()
         {
             // Arrange
-            var (token1, _) = await RegisterAndLoginUser("GiftOwner", "password123");
+            var (token1, _) = await _client.RegisterAndLoginUser("GiftOwner", "password123");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token1);
 
             var giftDto = new GiftCreateDto { Title = "Owner's Gift" };
@@ -112,7 +104,7 @@ namespace WishlistWeb.IntegrationTests
             var createdGift = await createResponse.Content.ReadFromJsonAsync<GiftReadDto>();
 
             // Login as different user
-            var (token2, _) = await RegisterAndLoginUser("NotOwner", "password123");
+            var (token2, _) = await _client.RegisterAndLoginUser("NotOwner", "password123");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token2);
 
             var updateDto = new GiftUpdateDto { Title = "Hacked Title", IsTaken = false };
@@ -128,7 +120,7 @@ namespace WishlistWeb.IntegrationTests
         public async Task DeleteGift_AsOwner_ShouldSucceed()
         {
             // Arrange
-            var (token, _) = await RegisterAndLoginUser("GiftUser4", "password123");
+            var (token, _) = await _client.RegisterAndLoginUser("GiftUser4", "password123");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var giftDto = new GiftCreateDto { Title = "Gift to Delete" };
@@ -150,7 +142,7 @@ namespace WishlistWeb.IntegrationTests
         public async Task DeleteGift_AsNonOwner_ShouldReturnForbidden()
         {
             // Arrange
-            var (token1, _) = await RegisterAndLoginUser("Owner2", "password123");
+            var (token1, _) = await _client.RegisterAndLoginUser("Owner2", "password123");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token1);
 
             var giftDto = new GiftCreateDto { Title = "Protected Gift" };
@@ -158,7 +150,7 @@ namespace WishlistWeb.IntegrationTests
             var createdGift = await createResponse.Content.ReadFromJsonAsync<GiftReadDto>();
 
             // Login as different user
-            var (token2, _) = await RegisterAndLoginUser("NotOwner2", "password123");
+            var (token2, _) = await _client.RegisterAndLoginUser("NotOwner2", "password123");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token2);
 
             // Act

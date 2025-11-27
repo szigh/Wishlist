@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using WishlistContracts.DTOs;
+using WishlistModels;
 using Xunit;
 
 namespace WishlistWeb.IntegrationTests
@@ -152,7 +153,6 @@ namespace WishlistWeb.IntegrationTests
 
             var volunteer = await claimResponse.Content.ReadFromJsonAsync<Volunteer>(_jsonOptions);
             Assert.NotNull(volunteer);
-            var volunteerId = volunteer.Id;
 
             // 9. B can see in their claims that they are buying that gift
             var myClaimsResponse = await _client.GetAsync("/api/volunteers");

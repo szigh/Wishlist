@@ -15,19 +15,11 @@ namespace WishlistWeb.IntegrationTests
             _client = factory.CreateClient();
         }
 
-        private async Task<(string token, int userId)> RegisterAndLoginUser(string username, string password)
-        {
-            var request = new LoginRequestDto { Name = username, Password = password };
-            var response = await _client.PostAsJsonAsync("/api/auth/register", request);
-            var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponseDto>();
-            return (loginResponse!.Token, loginResponse.UserId);
-        }
-
         [Fact]
         public async Task GetUsers_WithAuthentication_ShouldReturnUserList()
         {
             // Arrange
-            var (token, _) = await RegisterAndLoginUser("UserListTest1", "password123");
+            var (token, _) = await _client.RegisterAndLoginUser("UserListTest1", "password123");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             // Act
@@ -44,7 +36,7 @@ namespace WishlistWeb.IntegrationTests
         public async Task GetUser_WithValidId_ShouldReturnUser()
         {
             // Arrange
-            var (token, userId) = await RegisterAndLoginUser("UserGetTest", "password123");
+            var (token, userId) = await _client.RegisterAndLoginUser("UserGetTest", "password123");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             // Act
@@ -62,7 +54,7 @@ namespace WishlistWeb.IntegrationTests
         public async Task GetUsersWishlist_WithValidUserId_ShouldReturnWishlist()
         {
             // Arrange
-            var (token, userId) = await RegisterAndLoginUser("WishlistTest", "password123");
+            var (token, userId) = await _client.RegisterAndLoginUser("WishlistTest", "password123");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             // Create a gift
@@ -85,14 +77,14 @@ namespace WishlistWeb.IntegrationTests
         public async Task GetUsersWishlist_ForAnotherUser_ShouldReturnTheirWishlist()
         {
             // Arrange - User A creates a wishlist
-            var (tokenA, userAId) = await RegisterAndLoginUser("UserA_Wishlist", "password123");
+            var (tokenA, userAId) = await _client.RegisterAndLoginUser("UserA_Wishlist", "password123");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenA);
             
             var giftDto = new GiftCreateDto { Title = "UserA's Gift" };
             await _client.PostAsJsonAsync("/api/gift", giftDto);
 
             // User B logs in and views User A's wishlist
-            var (tokenB, _) = await RegisterAndLoginUser("UserB_Wishlist", "password123");
+            var (tokenB, _) = await _client.RegisterAndLoginUser("UserB_Wishlist", "password123");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenB);
 
             // Act
@@ -110,7 +102,7 @@ namespace WishlistWeb.IntegrationTests
         public async Task GetUser_WithInvalidId_ShouldReturnNotFound()
         {
             // Arrange
-            var (token, _) = await RegisterAndLoginUser("UserNotFoundTest", "password123");
+            var (token, _) = await _client.RegisterAndLoginUser("UserNotFoundTest", "password123");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             // Act
