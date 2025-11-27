@@ -18,21 +18,9 @@ namespace WishlistWeb.IntegrationTests
         {
             builder.ConfigureTestServices(services =>
             {
-                // Remove the existing DbContext registration from Program.cs
-                var descriptor = services.SingleOrDefault(
-                    d => d.ServiceType == typeof(DbContextOptions<WishlistDbContext>));
-                if (descriptor != null)
-                {
-                    services.Remove(descriptor);
-                }
-
-                // Also remove the DbContext itself to ensure clean replacement
-                var dbContextDescriptor = services.SingleOrDefault(
-                    d => d.ServiceType == typeof(WishlistDbContext));
-                if (dbContextDescriptor != null)
-                {
-                    services.Remove(dbContextDescriptor);
-                }
+                // Remove all existing DbContext registrations from Program.cs
+                services.RemoveAll(typeof(DbContextOptions<WishlistDbContext>));
+                services.RemoveAll(typeof(WishlistDbContext));
 
                 // Use the same database name for all requests in this factory instance
                 services.AddDbContext<WishlistDbContext>(options =>
