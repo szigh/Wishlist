@@ -1,3 +1,25 @@
+:root {
+  /* Dark theme colors */
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2a2a2a;
+  --bg-tertiary: #3a3a3a;
+  --text-primary: #e0e0e0;
+  --text-secondary: #a0a0a0;
+  --text-muted: #707070;
+  --border-color: #404040;
+  --border-hover: #505050;
+  --accent-primary: #667eea;
+  --accent-secondary: #764ba2;
+  --error-bg: #3d1515;
+  --error-border: #6b2020;
+  --error-text: #ff6b6b;
+  --success-bg: #1a3d1a;
+  --success-border: #2d6b2d;
+  --success-text: #4caf50;
+  --card-bg: #252525;
+  --card-hover-shadow: rgba(0, 0, 0, 0.5);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -9,17 +31,19 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #f5f5f5;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   min-width: 320px;
 }
 
 .app-layout {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: var(--bg-primary);
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
+  color: var(--text-primary);
 }
 
 button {
@@ -30,13 +54,13 @@ button {
   text-align: center;
   padding: 60px 20px;
   font-size: 18px;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .error-message {
-  background: #fee;
-  border: 1px solid #fcc;
-  color: #c33;
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  color: var(--error-text);
   padding: 12px;
   border-radius: 8px;
   margin: 20px 0;
@@ -45,6 +69,6 @@ button {
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: #999;
+  color: var(--text-muted);
   font-size: 18px;
 }
