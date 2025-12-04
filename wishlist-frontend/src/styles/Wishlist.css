@@ -128,7 +128,7 @@
 
 .btn-claim:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.6);
+  box-shadow: 0 4px 12px var(--accent-shadow);
 }
 
 .btn-delete {
@@ -138,15 +138,15 @@
 }
 
 .btn-delete:hover {
-  background: #4d1f1f;
+  background: var(--btn-delete-hover);
 }
 
 .btn-unclaim {
-  background: #3d2a15;
-  color: #ffa726;
-  border: 1px solid #5a3a20;
+  background: var(--btn-unclaim-bg);
+  color: var(--btn-unclaim-text);
+  border: 1px solid var(--btn-unclaim-border);
 }
 
 .btn-unclaim:hover {
-  background: #4d3520;
+  background: var(--btn-unclaim-hover);
 }
