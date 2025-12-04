@@ -18,6 +18,24 @@
   --success-text: #4caf50;
   --card-bg: #252525;
   --card-hover-shadow: rgba(0, 0, 0, 0.5);
+  
+  /* Shadow variables */
+  --nav-shadow: rgba(0, 0, 0, 0.3);
+  --auth-shadow: rgba(0, 0, 0, 0.6);
+  --accent-shadow: rgba(102, 126, 234, 0.6);
+  
+  /* Auth background gradient */
+  --auth-bg-start: #1a1f3a;
+  --auth-bg-end: #2a1a3a;
+  
+  /* Button colors - delete */
+  --btn-delete-hover: #4d1f1f;
+  
+  /* Button colors - unclaim */
+  --btn-unclaim-bg: #3d2a15;
+  --btn-unclaim-text: #ffa726;
+  --btn-unclaim-border: #5a3a20;
+  --btn-unclaim-hover: #4d3520;
 }
 
 * {

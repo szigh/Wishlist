@@ -71,7 +71,8 @@ class ApiClient {
       return this.handleResponse<T>(response, startTime);
     } catch (error) {
       // Handle network errors (backend not running, no internet, etc.)
-      if (error instanceof TypeError && error.message === 'Failed to fetch') {
+      // Check for TypeError with message containing 'fetch' for cross-browser compatibility
+      if (error instanceof TypeError && typeof error.message === 'string' && error.message.toLowerCase().includes('fetch')) {
         logger.error('Network Error', 'Unable to connect to the server. Please check if the backend is running.');
         throw new Error('Unable to connect to the server. Please make sure the backend is running and try again.');
       }

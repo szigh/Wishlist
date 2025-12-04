@@ -11,7 +11,7 @@
   background: var(--bg-secondary);
   padding: 40px;
   border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  box-shadow: 0 20px 60px var(--auth-shadow);
   max-width: 400px;
   width: 100%;
   border: 1px solid var(--border-color);
