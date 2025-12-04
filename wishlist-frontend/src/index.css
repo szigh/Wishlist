@@ -18,6 +18,7 @@
   --success-text: #4caf50;
   --card-bg: #252525;
   --card-hover-shadow: rgba(0, 0, 0, 0.5);
+  --nav-shadow: rgba(0, 0, 0, 0.3);
 }
 
 * {
