@@ -60,6 +60,7 @@ export function MyClaimsPage() {
           {claims.map(claim => (
             <div key={claim.id} className="claim-card">
               <h3>{claim.gift?.title}</h3>
+              <span className="gift-id">Gift ID: {claim.gift?.id}</span>
               
               {claim.gift?.description && (
                 <p className="claim-description">{claim.gift.description}</p>

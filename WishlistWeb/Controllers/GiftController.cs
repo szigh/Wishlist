@@ -84,6 +84,11 @@ namespace WishlistWeb.Controllers
                 _logger.Warn($"Gift not found or unauthorized - ID: {id}, User ID: {userId}");
                 return NotFound();
             }
+            if (gift.IsTaken)
+            {
+                _logger.Warn($"Gift id {id} for user {userId} is already claimed and cannot be edited");
+                return NotFound();
+            }
 
             // Map onto the existing tracked entity
             _mapper.Map(updateDto, gift);

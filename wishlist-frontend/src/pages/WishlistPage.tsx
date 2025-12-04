@@ -82,6 +82,7 @@ export function WishlistPage() {
             <div key={gift.id} className={`gift-card ${gift.isTaken ? 'claimed' : ''}`}>
               <div className="gift-header">
                 <h3>{gift.title}</h3>
+                <span className="gift-id">ID: {gift.id}</span>
                 {gift.isTaken && <span className="claimed-badge">Claimed</span>}
               </div>
               
