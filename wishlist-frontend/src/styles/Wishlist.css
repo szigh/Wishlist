@@ -18,13 +18,13 @@
 .page-header h1 {
   margin: 0 0 8px 0;
   font-size: 32px;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .wishlist-header p,
 .page-header p {
   margin: 0;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .gifts-grid,
@@ -36,8 +36,8 @@
 
 .gift-card,
 .claim-card {
-  background: white;
-  border: 2px solid #e0e0e0;
+  background: var(--card-bg);
+  border: 2px solid var(--border-color);
   border-radius: 12px;
   padding: 24px;
   transition: all 0.3s;
@@ -45,12 +45,12 @@
 
 .gift-card:hover,
 .claim-card:hover {
-  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 24px var(--card-hover-shadow);
 }
 
 .gift-card.claimed {
-  background: #f8f8f8;
-  border-color: #d0d0d0;
+  background: var(--bg-tertiary);
+  border-color: var(--border-hover);
 }
 
 .gift-header {
@@ -63,7 +63,7 @@
 .gift-header h3 {
   margin: 0;
   font-size: 20px;
-  color: #333;
+  color: var(--text-primary);
   flex: 1;
 }
 
@@ -76,7 +76,7 @@
 }
 
 .claimed-badge {
-  background: #4caf50;
+  background: var(--success-text);
   color: white;
   padding: 4px 12px;
   border-radius: 12px;
@@ -97,7 +97,7 @@
 
 .gift-description,
 .claim-description {
-  color: #666;
+  color: var(--text-secondary);
   margin: 12px 0;
   line-height: 1.5;
 }
@@ -105,18 +105,18 @@
 .gift-category,
 .claim-category {
   display: inline-block;
-  background: #f0f0f0;
+  background: var(--bg-tertiary);
   padding: 4px 12px;
   border-radius: 12px;
   font-size: 14px;
-  color: #666;
+  color: var(--text-secondary);
   margin: 8px 0;
 }
 
 .gift-link,
 .claim-link {
   display: inline-block;
-  color: #667eea;
+  color: var(--accent-primary);
   text-decoration: none;
   margin: 12px 0;
   font-weight: 500;
@@ -141,31 +141,31 @@
 }
 
 .btn-claim {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
   color: white;
 }
 
 .btn-claim:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px var(--accent-shadow);
 }
 
 .btn-delete {
-  background: #fee;
-  color: #c33;
-  border: 1px solid #fcc;
+  background: var(--error-bg);
+  color: var(--error-text);
+  border: 1px solid var(--error-border);
 }
 
 .btn-delete:hover {
-  background: #fdd;
+  background: var(--btn-delete-hover);
 }
 
 .btn-unclaim {
-  background: #fff3e0;
-  color: #f57c00;
-  border: 1px solid #ffe0b2;
+  background: var(--btn-unclaim-bg);
+  color: var(--btn-unclaim-text);
+  border: 1px solid var(--btn-unclaim-border);
 }
 
 .btn-unclaim:hover {
-  background: #ffe0b2;
+  background: var(--btn-unclaim-hover);
 }
