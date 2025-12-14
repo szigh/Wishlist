@@ -187,6 +187,7 @@ class ApiClient {
       headers: this.getAuthHeaders(),
       body: JSON.stringify(claim)
     });
+    return this.handleResponse<Volunteer>(response, startTime);
   }
 
   async unclaimGift(id: number): Promise<void> {
