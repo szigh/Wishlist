@@ -16,8 +16,7 @@ builder.Services.AddAutoMapper(cfg =>
 // Skip DbContext registration if running integration tests
 if (Environment.GetEnvironmentVariable("INTEGRATION_TEST") != "true")
 {
-    builder.Services.AddDbContext<WishlistDbContext>(
-        options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    builder.InitializeDatabase();
 }
 
 // Configure CORS
@@ -104,5 +103,22 @@ app.MapControllers();
 
 app.Run();
 
-// Make the implicit Program class accessible for testing
-public partial class Program { }
+
+public static partial class Program
+{
+    static void InitializeDatabase(this WebApplicationBuilder builder)
+    {
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            throw new InvalidOperationException(
+                "Database connection string 'DefaultConnection' is not configured. " +
+                "Please set 'ConnectionStrings:DefaultConnection' in your configuration.");
+        }
+
+        builder.Services.AddDbContext<WishlistDbContext>(
+            options => options.UseSqlite(connectionString));
+    }
+}
+
