@@ -18,6 +18,26 @@ namespace WishlistWeb.Controllers
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(AuthController));
 
+        [HttpGet("Ping")]
+        public IActionResult Ping()
+        {
+            return Ok();
+        }
+
+        [HttpGet("config-check")]
+        public IActionResult CheckConfiguration()
+        {
+            var config = new
+            {
+                JwtKeyConfigured = !string.IsNullOrEmpty(_configuration["Jwt:Key"]),
+                JwtKeyLength = _configuration["Jwt:Key"]?.Length ?? 0,
+                ConnectionStringsConfigured = !string.IsNullOrEmpty(_configuration.GetConnectionString("DefaultConnection")),
+                AutomapperKeyConfigured= !string.IsNullOrEmpty(_configuration["AutomapperKey"])
+            };
+
+            return Ok(config);
+        }
+
         // POST: api/auth/login
         [HttpPost("login")]
         public async Task<ActionResult<LoginResponseDto>> Login(LoginRequestDto request)
