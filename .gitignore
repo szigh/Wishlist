@@ -365,3 +365,16 @@ FodyWeavers.xsd
 .data/wishlist.db
 .data/wishlist.db-shm
 .data/wishlist.db-wal
+
+# Docker database storage
+.docker-data/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.production
+
+# Markdown documentation (except README.md)
+*.md
+!README.md

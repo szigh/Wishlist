@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WishlistWeb.Services;
+using WishlistModels;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,6 +66,16 @@ builder.Services.AddOpenApi();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 var app = builder.Build();
+
+// Apply database migrations automatically
+if (Environment.GetEnvironmentVariable("INTEGRATION_TEST") != "true")
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<WishlistDbContext>();
+        db.Database.Migrate();
+    }
+}
 
 if (app.Environment.IsDevelopment())
 {

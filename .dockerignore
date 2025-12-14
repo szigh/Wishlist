@@ -1,0 +1,57 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Build artifacts
+**/bin/
+**/obj/
+**/out/
+**/dist/
+**/build/
+
+# Node modules
+**/node_modules/
+
+# IDE
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Testing
+**/TestResults/
+**/*.IntegrationTests/
+
+# Docker
+docker-compose*.yml
+Dockerfile
+.dockerignore
+
+# Documentation
+*.md
+LICENSE.txt
+
+# Frontend specific
+wishlist-frontend/.vite/
+wishlist-frontend/coverage/

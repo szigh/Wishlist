@@ -12,7 +12,8 @@ import type {
 } from '../types';
 import { logger } from '../utils/logger';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://localhost:7059/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_ENDPOINT = `${API_BASE_URL}/api`;
 
 class ApiClient {
   private getAuthHeaders(): HeadersInit {
@@ -25,7 +26,7 @@ class ApiClient {
 
   private async handleResponse<T>(response: Response, startTime: number): Promise<T> {
     const duration = Date.now() - startTime;
-    const url = response.url.replace(API_BASE_URL, '');
+    const url = response.url.replace(API_ENDPOINT, '');
     
     logger.api(response.status < 400 ? 'SUCCESS' : 'ERROR', url, response.status, duration);
     
@@ -52,7 +53,7 @@ class ApiClient {
   // Auth endpoints
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     const startTime = Date.now();
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    const response = await fetch(`${API_ENDPOINT}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(credentials)
@@ -62,7 +63,7 @@ class ApiClient {
 
   async register(credentials: RegisterRequest): Promise<LoginResponse> {
     const startTime = Date.now();
-    const response = await fetch(`${API_BASE_URL}/auth/register`, {
+    const response = await fetch(`${API_ENDPOINT}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(credentials)
@@ -72,7 +73,7 @@ class ApiClient {
 
   async logout(): Promise<void> {
     const startTime = Date.now();
-    const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+    const response = await fetch(`${API_ENDPOINT}/auth/logout`, {
       method: 'POST',
       headers: this.getAuthHeaders()
     });
@@ -82,7 +83,7 @@ class ApiClient {
   // User endpoints
   async getUsers(): Promise<User[]> {
     const startTime = Date.now();
-    const response = await fetch(`${API_BASE_URL}/users`, {
+    const response = await fetch(`${API_ENDPOINT}/users`, {
       headers: this.getAuthHeaders()
     });
     return this.handleResponse<User[]>(response, startTime);
@@ -90,7 +91,7 @@ class ApiClient {
 
   async getUser(id: number): Promise<User> {
     const startTime = Date.now();
-    const response = await fetch(`${API_BASE_URL}/users/${id}`, {
+    const response = await fetch(`${API_ENDPOINT}/users/${id}`, {
       headers: this.getAuthHeaders()
     });
     return this.handleResponse<User>(response, startTime);
@@ -98,7 +99,7 @@ class ApiClient {
 
   async getUserWishlist(id: number): Promise<UserWithWishlist> {
     const startTime = Date.now();
-    const response = await fetch(`${API_BASE_URL}/users/${id}/wishlist`, {
+    const response = await fetch(`${API_ENDPOINT}/users/${id}/wishlist`, {
       headers: this.getAuthHeaders()
     });
     return this.handleResponse<UserWithWishlist>(response, startTime);
@@ -107,7 +108,7 @@ class ApiClient {
   // Gift endpoints
   async getGifts(): Promise<Gift[]> {
     const startTime = Date.now();
-    const response = await fetch(`${API_BASE_URL}/gift`, {
+    const response = await fetch(`${API_ENDPOINT}/gift`, {
       headers: this.getAuthHeaders()
     });
     return this.handleResponse<Gift[]>(response, startTime);
@@ -115,7 +116,7 @@ class ApiClient {
 
   async getGift(id: number): Promise<Gift> {
     const startTime = Date.now();
-    const response = await fetch(`${API_BASE_URL}/gift/${id}`, {
+    const response = await fetch(`${API_ENDPOINT}/gift/${id}`, {
       headers: this.getAuthHeaders()
     });
     return this.handleResponse<Gift>(response, startTime);
@@ -123,7 +124,7 @@ class ApiClient {
 
   async createGift(gift: GiftCreate): Promise<Gift> {
     const startTime = Date.now();
-    const response = await fetch(`${API_BASE_URL}/gift`, {
+    const response = await fetch(`${API_ENDPOINT}/gift`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(gift)
@@ -133,7 +134,7 @@ class ApiClient {
 
   async updateGift(id: number, gift: GiftUpdate): Promise<void> {
     const startTime = Date.now();
-    const response = await fetch(`${API_BASE_URL}/gift/${id}`, {
+    const response = await fetch(`${API_ENDPOINT}/gift/${id}`, {
       method: 'PUT',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(gift)
@@ -143,7 +144,7 @@ class ApiClient {
 
   async deleteGift(id: number): Promise<void> {
     const startTime = Date.now();
-    const response = await fetch(`${API_BASE_URL}/gift/${id}`, {
+    const response = await fetch(`${API_ENDPOINT}/gift/${id}`, {
       method: 'DELETE',
       headers: this.getAuthHeaders()
     });
@@ -153,7 +154,7 @@ class ApiClient {
   // Volunteer (Claim) endpoints
   async getVolunteers(): Promise<Volunteer[]> {
     const startTime = Date.now();
-    const response = await fetch(`${API_BASE_URL}/volunteers`, {
+    const response = await fetch(`${API_ENDPOINT}/volunteers`, {
       headers: this.getAuthHeaders()
     });
     return this.handleResponse<Volunteer[]>(response, startTime);
@@ -161,7 +162,7 @@ class ApiClient {
 
   async claimGift(claim: VolunteerCreate): Promise<Volunteer> {
     const startTime = Date.now();
-    const response = await fetch(`${API_BASE_URL}/volunteers`, {
+    const response = await fetch(`${API_ENDPOINT}/volunteers`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(claim)
@@ -171,7 +172,7 @@ class ApiClient {
 
   async unclaimGift(id: number): Promise<void> {
     const startTime = Date.now();
-    const response = await fetch(`${API_BASE_URL}/volunteers/${id}`, {
+    const response = await fetch(`${API_ENDPOINT}/volunteers/${id}`, {
       method: 'DELETE',
       headers: this.getAuthHeaders()
     });

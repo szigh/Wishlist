@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # Backend API
+  wishlist-api:
+    build:
+      context: .
+      dockerfile: WishlistWeb/Dockerfile
+    container_name: wishlist-api-prod
+    ports:
+      - "5000:8080"  # Format: "HOST_PORT:CONTAINER_PORT" - Access API at http://localhost:5000
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Data Source=../.data/wishlist.db
+      - Jwt__Key=${JWT_KEY}
+      - Jwt__Issuer=${JWT_ISSUER:-WishlistApi}
+      - Jwt__Audience=${JWT_AUDIENCE:-WishlistClient}
+      - Jwt__ExpirationMinutes=${JWT_EXPIRATION_MINUTES:-60}
+      - AutomapperKey=${AUTOMAPPER_KEY:-}
+      - Cors__AllowedOrigins__0=${FRONTEND_URL:-http://localhost}
+    volumes:
+      - wishlist-data:/data
+    networks:
+      - wishlist-network
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Frontend
+  wishlist-frontend:
+    build:
+      context: ./wishlist-frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${VITE_API_URL:-http://localhost:5000}
+    container_name: wishlist-frontend-prod
+    ports:
+      - "80:80"  # Format: "HOST_PORT:CONTAINER_PORT" - Access frontend at http://localhost
+    networks:
+      - wishlist-network
+    depends_on:
+      - wishlist-api
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  wishlist-data:
+    driver: local
+
+networks:
+  wishlist-network:
+    driver: bridge
