@@ -46,15 +46,17 @@ namespace WishlistWeb.IntegrationTests
         {
             // Arrange
             var client = _factory.CreateClient();
+            var beforeRequest = DateTime.UtcNow;
 
             // Act
             var response = await client.GetAsync("/api/health");
+            var afterRequest = DateTime.UtcNow.AddSeconds(1); // Add 1 second tolerance
             var content = await response.Content.ReadFromJsonAsync<HealthResponse>();
 
             // Assert
             Assert.NotNull(content);
-            Assert.True(content.Timestamp > DateTime.MinValue);
-            Assert.True(content.Timestamp <= DateTime.UtcNow);
+            Assert.True(content.Timestamp >= beforeRequest, "Timestamp should be after request started");
+            Assert.True(content.Timestamp <= afterRequest, "Timestamp should be before request completed (with tolerance)");
         }
 
         [Fact]

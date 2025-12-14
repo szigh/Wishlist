@@ -15,13 +15,16 @@ namespace WishlistWeb.IntegrationTests
         // Static field to ensure the same database name is used across all requests
         private static readonly string _databaseName = $"InMemoryTestDb_{Guid.NewGuid()}";
         
+        // JWT signing key for integration tests (must be at least 32 characters for HS256)
+        private const string TestJwtKey = "TestKeyForIntegrationTestsThatIsLongEnough123456";
+        
         public CustomWebApplicationFactory()
         {
             // Set environment variable to skip SQLite registration in Program.cs
             Environment.SetEnvironmentVariable("INTEGRATION_TEST", "true");
             
             // Set JWT configuration through environment variables
-            Environment.SetEnvironmentVariable("Jwt__Key", "TestKeyForIntegrationTestsThatIsLongEnough123456");
+            Environment.SetEnvironmentVariable("Jwt__Key", TestJwtKey);
             Environment.SetEnvironmentVariable("Jwt__Issuer", "WishlistTestApi");
             Environment.SetEnvironmentVariable("Jwt__Audience", "WishlistTestClient");
             Environment.SetEnvironmentVariable("Jwt__ExpirationMinutes", "60");
