@@ -1,10 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using WishlistContracts.DTOs;
 using WishlistModels;
 using log4net;
@@ -14,31 +11,11 @@ namespace WishlistWeb.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController(WishlistDbContext _context, IConfiguration _configuration, IJwtTokenService _jwtTokenService) 
+    public class AuthController(WishlistDbContext _context, IJwtTokenService _jwtTokenService) 
         : ControllerBase
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(AuthController));
 
-        [HttpGet("Ping")]
-        public IActionResult Ping()
-        {
-            return Ok();
-        }
-
-        [Authorize]
-        [HttpGet("config-check")]
-        public IActionResult CheckConfiguration()
-        {
-            var config = new
-            {
-                JwtKeyConfigured = !string.IsNullOrEmpty(_configuration["Jwt:Key"]),
-                JwtKeyLength = _configuration["Jwt:Key"]?.Length ?? 0,
-                ConnectionStringsConfigured = !string.IsNullOrEmpty(_configuration.GetConnectionString("DefaultConnection")),
-                AutomapperKeyConfigured= !string.IsNullOrEmpty(_configuration["AutomapperKey"])
-            };
-
-            return Ok(config);
-        }
 
         // POST: api/auth/login
         [HttpPost("login")]

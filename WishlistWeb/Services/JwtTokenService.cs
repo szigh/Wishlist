@@ -7,15 +7,10 @@ using log4net;
 
 namespace WishlistWeb.Services
 {
-    public class JwtTokenService : IJwtTokenService
+    public class JwtTokenService(IConfiguration configuration) : IJwtTokenService
     {
-        private readonly IConfiguration _configuration;
+        private readonly IConfiguration _configuration = configuration;
         private static readonly ILog _logger = LogManager.GetLogger(typeof(JwtTokenService));
-
-        public JwtTokenService(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
 
         /// <summary>
         /// Generates a JWT (JSON Web Token) for authenticating the specified user.
@@ -43,6 +38,12 @@ namespace WishlistWeb.Services
             var jwtIssuer = _configuration["Jwt:Issuer"];
             var jwtAudience = _configuration["Jwt:Audience"];
             var jwtExpirationMinutes = _configuration.GetValue<int>("Jwt:ExpirationMinutes");
+
+            if (string.IsNullOrWhiteSpace(jwtKey))
+            {
+                _logger.Error("JWT key is missing or empty in configuration (Jwt:Key).");
+                throw new InvalidOperationException("Jwt:Key configuration is required to generate JWT tokens.");
+            }
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
