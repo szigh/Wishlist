@@ -216,22 +216,27 @@ docker-compose restart
 # Rebuild after code changes (preserves database)
 docker-compose up --build
 
-# Backup database (Docker volume - default)
+# Backup database
+# Copy the database from the running container to your current directory
 docker cp wishlist-api:/data/wishlist.db ./backup-wishlist.db
 
-docker cp wishlist-api:/data/wishlist.db ./backup.db # Or use this if database path was customized or containers are running
+# Restore database from backup
+# Stop the application first, then copy the backup back
+docker-compose down
+docker-compose up -d
+docker cp ./backup-wishlist.db wishlist-api:/data/wishlist.db
+docker-compose restart wishlist-api
 
-# Or if using custom host path (when DATABASE_PATH is set in .env)
-Copy-Item .\backup-wishlist.db C:\your\custom\path\wishlist.db
-
-# Reset database (⚠️ deletes all data - backup first if needed!)
+# Reset database (⚠️ deletes all data!)
+# 1. Stop all containers
 docker-compose down
 
-# If using Docker volume (default):
-docker volume rm <project>_wishlist-data   # Replace <project> with your project directory name (e.g., 'wishlist_wishlist-data')
+# 2. Remove the database volume (use 'docker volume ls' to find the exact name)
+docker volume ls  # Look for a volume name ending in '_wishlist-data'
+docker volume rm <volume-name>  # Replace <volume-name> with the actual volume name
 
-# If using host path (custom DATABASE_PATH):
-Remove-Item -Recurse -Force C:\your\custom\path
+# 3. Start fresh
+docker-compose up --build
 ```
 
 ## Database Configuration
