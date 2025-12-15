@@ -228,7 +228,7 @@ Copy-Item .\backup-wishlist.db C:\your\custom\path\wishlist.db
 docker-compose down
 
 # If using Docker volume (default):
-docker volume rm wishlist-copy-2_wishlist-data
+docker volume rm <project>_wishlist-data   # Replace <project> with your project directory name (e.g., 'wishlist_wishlist-data')
 
 # If using host path (custom DATABASE_PATH):
 Remove-Item -Recurse -Force C:\your\custom\path
