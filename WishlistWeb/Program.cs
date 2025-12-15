@@ -100,7 +100,7 @@ app.MapControllers();
 
 app.Run();
 
-//needed for CustomWebApplicationFactory
+// Make the implicit Program class accessible for integration testing with WebApplicationFactory
 #pragma warning disable ASP0027 // Unnecessary public Program class declaration
 public partial class Program{}
 #pragma warning restore ASP0027 // Unnecessary public Program class declaration
