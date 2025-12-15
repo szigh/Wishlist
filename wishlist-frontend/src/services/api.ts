@@ -83,6 +83,8 @@ class ApiClient {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(credentials)
     });
+
+    return this.handleResponse(response, startTime);
   }
 
   async register(credentials: RegisterRequest): Promise<LoginResponse> {
@@ -92,6 +94,8 @@ class ApiClient {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(credentials)
     });
+
+    return this.handleResponse(response, startTime);
   }
 
   async logout(): Promise<void> {
@@ -100,6 +104,8 @@ class ApiClient {
       method: 'POST',
       headers: this.getAuthHeaders()
     });
+
+    return this.handleResponse(response, startTime);
   }
 
   // User endpoints
@@ -151,6 +157,8 @@ class ApiClient {
       headers: this.getAuthHeaders(),
       body: JSON.stringify(gift)
     });
+
+    return this.handleResponse(response, startTime);
   }
 
   async updateGift(id: number, gift: GiftUpdate): Promise<void> {
@@ -160,6 +168,8 @@ class ApiClient {
       headers: this.getAuthHeaders(),
       body: JSON.stringify(gift)
     });
+
+    return this.handleResponse(response, startTime);
   }
 
   async deleteGift(id: number): Promise<void> {
@@ -168,6 +178,8 @@ class ApiClient {
       method: 'DELETE',
       headers: this.getAuthHeaders()
     });
+
+    return this.handleResponse(response, startTime);
   }
 
   // Volunteer (Claim) endpoints
@@ -195,6 +207,8 @@ class ApiClient {
       method: 'DELETE',
       headers: this.getAuthHeaders()
     });
+
+    return this.handleResponse(response, startTime);
   }
 }
 

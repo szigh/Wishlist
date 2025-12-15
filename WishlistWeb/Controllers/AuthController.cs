@@ -25,6 +25,7 @@ namespace WishlistWeb.Controllers
             return Ok();
         }
 
+        [Authorize]
         [HttpGet("config-check")]
         public IActionResult CheckConfiguration()
         {
