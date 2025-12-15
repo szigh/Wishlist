@@ -33,7 +33,7 @@ namespace WishlistWeb.Controllers
                 JwtKeyConfigured = !string.IsNullOrEmpty(_configuration["Jwt:Key"]),
                 JwtKeyLength = _configuration["Jwt:Key"]?.Length ?? 0,
                 ConnectionStringsConfigured = !string.IsNullOrEmpty(_configuration.GetConnectionString("DefaultConnection")),
-                AutomapperKeyConfigured= !string.IsNullOrEmpty(_configuration["AutomapperKey"])
+                AutomapperKeyConfigured = !string.IsNullOrEmpty(_configuration["AutomapperKey"])
             };
 
             return Ok(config);
