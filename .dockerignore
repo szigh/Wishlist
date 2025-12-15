@@ -44,7 +44,6 @@ Thumbs.db
 **/*.IntegrationTests/
 
 # Docker
-docker-compose*.yml
 Dockerfile
 .dockerignore
 
