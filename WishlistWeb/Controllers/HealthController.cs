@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using WishlistContracts.DTOs;
 
 namespace WishlistWeb.Controllers
 {
@@ -9,10 +10,10 @@ namespace WishlistWeb.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(new
+            return Ok(new HealthResponseDto
             {
-                status = "healthy",
-                timestamp = DateTime.UtcNow
+                Status = "healthy",
+                Timestamp = DateTime.UtcNow
             });
         }
     }

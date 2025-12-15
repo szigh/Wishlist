@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using WishlistContracts.DTOs;
 using Xunit;
 
 namespace WishlistWeb.IntegrationTests
@@ -34,7 +35,7 @@ namespace WishlistWeb.IntegrationTests
 
             // Act
             var response = await client.GetAsync("/api/health");
-            var content = await response.Content.ReadFromJsonAsync<HealthResponse>();
+            var content = await response.Content.ReadFromJsonAsync<HealthResponseDto>();
 
             // Assert
             Assert.NotNull(content);
@@ -51,7 +52,7 @@ namespace WishlistWeb.IntegrationTests
             // Act
             var response = await client.GetAsync("/api/health");
             var afterRequest = DateTime.UtcNow.AddSeconds(1); // Add 1 second tolerance
-            var content = await response.Content.ReadFromJsonAsync<HealthResponse>();
+            var content = await response.Content.ReadFromJsonAsync<HealthResponseDto>();
 
             // Assert
             Assert.NotNull(content);
@@ -71,12 +72,6 @@ namespace WishlistWeb.IntegrationTests
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        }
-
-        private class HealthResponse
-        {
-            public string Status { get; set; } = string.Empty;
-            public DateTime Timestamp { get; set; }
         }
     }
 }
