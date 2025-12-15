@@ -12,7 +12,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8080
-      - ConnectionStrings__DefaultConnection=Data Source=../.data/wishlist.db
+      - ConnectionStrings__DefaultConnection=Data Source=/data/wishlist.db
       - Jwt__Key=${JWT_KEY}
       - Jwt__Issuer=${JWT_ISSUER:-WishlistApi}
       - Jwt__Audience=${JWT_AUDIENCE:-WishlistClient}

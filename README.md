@@ -55,7 +55,7 @@ JWT_KEY=your-super-secret-jwt-key-that-is-at-least-32-characters-long
 
 Add your Automapper key, or get a free (non-commercial) or paid license https://automapper.io/#pricing
 ```
-AUTOMAPPER_KEY
+AUTOMAPPER_KEY=
 ```
 
 2. **Start the application:**
@@ -216,27 +216,48 @@ docker-compose restart
 # Rebuild after code changes (preserves database)
 docker-compose up --build
 
-# Backup database (default location) - can be done anytime
-Copy-Item .docker-data\wishlist\wishlist.db .\backup-wishlist.db
+# Backup database (Docker volume - default)
+docker cp wishlist-api:/data/wishlist.db ./backup-wishlist.db
 
-# Or using docker cp (if database path was customized or containers are running)
-docker cp wishlist-api:/data/wishlist.db ./backup.db
+docker cp wishlist-api:/data/wishlist.db ./backup.db # Or use this if database path was customized or containers are running
+
+# Or if using custom host path (when DATABASE_PATH is set in .env)
+Copy-Item .\backup-wishlist.db C:\your\custom\path\wishlist.db
 
 # Reset database (⚠️ deletes all data - backup first if needed!)
 docker-compose down
-Remove-Item -Recurse -Force .docker-data
+
+# If using Docker volume (default):
+docker volume rm wishlist-copy-2_wishlist-data
+
+# If using host path (custom DATABASE_PATH):
+Remove-Item -Recurse -Force C:\your\custom\path
 ```
 
 ## Database Configuration
 
-By default, the database is stored at `./.docker-data/wishlist/wishlist.db` in your project folder. This makes it easy to access, backup, and manage.
+**Default (Recommended):** The database is stored in a Docker volume named `wishlist-data`. This is the recommended approach as it:
+- Is managed by Docker
+- Persists across container restarts
+- Provides better performance
+- Is portable across environments
 
-**To use a custom location:** Edit `.env` and set:
+**Custom Host Path (Optional):** If you need direct access to the database file from your host machine, edit `.env` and set:
 ```dotenv
 DATABASE_PATH=C:/your/custom/path
 ```
 
-The database will then be accessible at `C:\your\custom\path\wishlist.db`
+The database will then be accessible at `C:\your\custom\path\wishlist.db` on your host filesystem.
+
+**To access the database in the default Docker volume:**
+```powershell
+# Copy database out of Docker volume
+docker cp wishlist-api:/data/wishlist.db ./local-copy.db
+
+# Or start an interactive shell in the container
+docker exec -it wishlist-api sh
+# Then navigate to /data/wishlist.db
+```
 
 ## License
 

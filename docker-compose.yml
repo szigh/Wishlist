@@ -16,15 +16,15 @@ services:
       - Jwt__Key=${JWT_KEY:-your-super-secret-jwt-key-min-32-chars-long-12345}
       - Jwt__Issuer=WishlistApi
       - Jwt__Audience=WishlistClient
-      - Jwt__ExpirationMinutes=15
+      - Jwt__ExpirationMinutes=60
       - AutomapperKey=${AUTOMAPPER_KEY:-}
       - Cors__AllowedOrigins__0=http://localhost:3000
       - Cors__AllowedOrigins__1=http://localhost:80
       - Cors__AllowedOrigins__2=http://localhost
     volumes:
-      # If DATABASE_PATH is set in .env, uses that path (bind mount)
-      # Otherwise uses the named volume wishlist-data (default)
-      - ${DATABASE_PATH:-./.docker-data/wishlist}:/data
+      # If DATABASE_PATH is set in .env, uses that path as bind mount
+      # Otherwise uses the named volume wishlist-data (default, recommended)
+      - ${DATABASE_PATH:-wishlist-data}:/data
     networks:
       - wishlist-network
     restart: unless-stopped
@@ -44,6 +44,10 @@ services:
     depends_on:
       - wishlist-api
     restart: unless-stopped
+
+volumes:
+  wishlist-data:
+    driver: local
 
 networks:
   wishlist-network:
