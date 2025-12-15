@@ -177,8 +177,8 @@ Wishlist/
 ## Security Features
 
 - Password hashing with BCrypt
-- JWT tokens with configurable expiration (15–60 minutes by default, depending on environment)
-- Logout is handled on the frontend (tokens expire automatically after the configured expiration time)
+- JWT tokens with configurable expiration (default: 60 minutes in development)  
+- Logout is handled on the frontend (tokens expire automatically after the configured expiration time)  
 - Role-based authorization
 - User ownership validation (users can only modify their own resources)
 - Auto-population of user IDs from JWT claims
