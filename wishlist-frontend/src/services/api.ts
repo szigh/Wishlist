@@ -52,29 +52,6 @@ class ApiClient {
     return response.json();
   }
 
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    const startTime = Date.now();
-    try {
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        headers: this.getAuthHeaders(),
-        ...options,
-      });
-      return this.handleResponse<T>(response, startTime);
-    } catch (error) {
-      // Handle network errors (backend not running, no internet, etc.)
-      // Check for TypeError with message containing 'fetch' for cross-browser compatibility
-      if (error instanceof TypeError && typeof error.message === 'string' && error.message.toLowerCase().includes('fetch')) {
-        logger.error('Network Error', 'Unable to connect to the server. Please check if the backend is running.');
-        throw new Error('Unable to connect to the server. Please make sure the backend is running and try again.');
-      }
-      // Re-throw other errors
-      throw error;
-    }
-  }
-
   // Auth endpoints
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     const startTime = Date.now();
