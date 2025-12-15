@@ -13,7 +13,6 @@ import type {
 import { logger } from "../utils/logger";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-const API_ENDPOINT = `${API_BASE_URL}/api`;
 
 class ApiClient {
   private getAuthHeaders(): HeadersInit {
