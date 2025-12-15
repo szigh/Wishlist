@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using WishlistModels;
 using WishlistWeb;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using System.IdentityModel.Tokens.Jwt;
+using WishlistWeb.Services;
+using WishlistModels;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,8 +16,7 @@ builder.Services.AddAutoMapper(cfg =>
 // Skip DbContext registration if running integration tests
 if (Environment.GetEnvironmentVariable("INTEGRATION_TEST") != "true")
 {
-    builder.Services.AddDbContext<WishlistDbContext>(
-        options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    builder.InitializeDatabase();
 }
 
 // Configure CORS
@@ -36,26 +35,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Configure JWT Authentication
-var jwtKey = builder.Configuration["Jwt:Key"];
-var jwtIssuer = builder.Configuration["Jwt:Issuer"];
-var jwtAudience = builder.Configuration["Jwt:Audience"];
-
-// Validate that JWT configuration is present
-if (string.IsNullOrWhiteSpace(jwtKey))
-{
-    throw new InvalidOperationException("JWT signing key is not configured. Please set 'Jwt:Key' in your configuration.");
-}
-if (string.IsNullOrWhiteSpace(jwtIssuer))
-{
-    throw new InvalidOperationException("JWT issuer is not configured. Please set 'Jwt:Issuer' in your configuration.");
-}
-if (string.IsNullOrWhiteSpace(jwtAudience))
-{
-    throw new InvalidOperationException("JWT audience is not configured. Please set 'Jwt:Audience' in your configuration.");
-}
-// Clear default claim type mappings to use JWT claim names directly
-JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+(var jwtKey, var jwtIssuer, var jwtAudience) = builder.ConfigureJwt();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -83,8 +63,19 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddOpenApi();
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 var app = builder.Build();
+
+// Apply database migrations automatically
+if (Environment.GetEnvironmentVariable("INTEGRATION_TEST") != "true")
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<WishlistDbContext>();
+        db.Database.Migrate();
+    }
+}
 
 if (app.Environment.IsDevelopment())
 {
@@ -93,7 +84,12 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+// HTTPS redirection disabled in development for simpler Docker setup
+// In production, use a reverse proxy (Traefik, nginx, ALB) to handle HTTPS
+if (app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseCors("AllowReactApp");
 
@@ -104,5 +100,8 @@ app.MapControllers();
 
 app.Run();
 
-// Make the implicit Program class accessible for testing
-public partial class Program { }
+// Make the implicit Program class accessible for integration testing with WebApplicationFactory
+#pragma warning disable ASP0027 // Unnecessary public Program class declaration
+public partial class Program{}
+#pragma warning restore ASP0027 // Unnecessary public Program class declaration
+

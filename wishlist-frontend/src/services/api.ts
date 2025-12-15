@@ -1,29 +1,32 @@
-import type { 
-  LoginRequest, 
-  LoginResponse, 
-  RegisterRequest, 
-  User, 
+import type {
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  User,
   UserWithWishlist,
-  Gift, 
-  GiftCreate, 
+  Gift,
+  GiftCreate,
   GiftUpdate,
   Volunteer,
-  VolunteerCreate 
-} from '../types';
-import { logger } from '../utils/logger';
+  VolunteerCreate,
+} from "../types";
+import { logger } from "../utils/logger";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://localhost:7059/api';
+const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api';
 
 class ApiClient {
   private getAuthHeaders(): HeadersInit {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     return {
-      'Content-Type': 'application/json',
-      ...(token && { 'Authorization': `Bearer ${token}` })
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
     };
   }
 
-  private async handleResponse<T>(response: Response, startTime: number): Promise<T> {
+  private async handleResponse<T>(
+    response: Response,
+    startTime: number
+  ): Promise<T> {
     const duration = Date.now() - startTime;
     const url = response.url.replace(API_BASE_URL, '');
     
@@ -31,21 +34,21 @@ class ApiClient {
     
     if (!response.ok) {
       if (response.status === 401) {
-        logger.warn('Authentication failed - redirecting to login');
+        logger.warn("Authentication failed - redirecting to login");
         // Token expired or invalid - clear auth
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = '/login';
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "/login";
       }
       const error = await response.text();
       logger.error(`API Error: ${url}`, error);
       throw new Error(error || `HTTP error! status: ${response.status}`);
     }
-    
+
     if (response.status === 204) {
       return {} as T;
     }
-    
+
     return response.json();
   }
 
@@ -57,7 +60,8 @@ class ApiClient {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(credentials)
     });
-    return this.handleResponse<LoginResponse>(response, startTime);
+
+    return this.handleResponse(response, startTime);
   }
 
   async register(credentials: RegisterRequest): Promise<LoginResponse> {
@@ -67,7 +71,8 @@ class ApiClient {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(credentials)
     });
-    return this.handleResponse<LoginResponse>(response, startTime);
+
+    return this.handleResponse(response, startTime);
   }
 
   async logout(): Promise<void> {
@@ -76,7 +81,8 @@ class ApiClient {
       method: 'POST',
       headers: this.getAuthHeaders()
     });
-    return this.handleResponse<void>(response, startTime);
+
+    return this.handleResponse(response, startTime);
   }
 
   // User endpoints
@@ -128,7 +134,8 @@ class ApiClient {
       headers: this.getAuthHeaders(),
       body: JSON.stringify(gift)
     });
-    return this.handleResponse<Gift>(response, startTime);
+
+    return this.handleResponse(response, startTime);
   }
 
   async updateGift(id: number, gift: GiftUpdate): Promise<void> {
@@ -138,7 +145,8 @@ class ApiClient {
       headers: this.getAuthHeaders(),
       body: JSON.stringify(gift)
     });
-    return this.handleResponse<void>(response, startTime);
+
+    return this.handleResponse(response, startTime);
   }
 
   async deleteGift(id: number): Promise<void> {
@@ -147,7 +155,8 @@ class ApiClient {
       method: 'DELETE',
       headers: this.getAuthHeaders()
     });
-    return this.handleResponse<void>(response, startTime);
+
+    return this.handleResponse(response, startTime);
   }
 
   // Volunteer (Claim) endpoints
@@ -175,7 +184,8 @@ class ApiClient {
       method: 'DELETE',
       headers: this.getAuthHeaders()
     });
-    return this.handleResponse<void>(response, startTime);
+
+    return this.handleResponse(response, startTime);
   }
 }
 
