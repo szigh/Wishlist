@@ -84,7 +84,12 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+// HTTPS redirection disabled in development for simpler Docker setup
+// In production, use a reverse proxy (Traefik, nginx, ALB) to handle HTTPS
+if (app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseCors("AllowReactApp");
 
