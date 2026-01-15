@@ -13,6 +13,7 @@ namespace WishlistModels
         public DbSet<User> Users { get; set; }
         public DbSet<Gift> Gifts { get; set; }
         public DbSet<Volunteer> Volunteers { get; set; }
+        public DbSet<GiftDays> GiftDays { get; set; }
     }
 
     public class WishlistDbContextFactory : IDesignTimeDbContextFactory<WishlistDbContext>

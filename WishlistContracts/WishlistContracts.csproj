@@ -7,5 +7,9 @@
     <RootNamespace>WishlistContracts</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\WishlistModels\WishlistModels.csproj" />
+  </ItemGroup>
+
 
 </Project>

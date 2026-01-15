@@ -28,6 +28,15 @@ namespace WishlistWeb
             // Volunteer mappings
             CreateMap<Volunteer, VolunteerReadDto>();
             CreateMap<VolunteerCreateDto, Volunteer>();
+
+            // GiftDays mappings
+            CreateMap<GiftDays, GiftDaysReadDto>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.Name));
+            CreateMap<GiftDaysCreateDto, GiftDays>()
+                .ForMember(dest => dest.UserId, opt => opt.Ignore()); // handled in controller
+            CreateMap<GiftDaysUpdateDto, GiftDays>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.UserId, opt => opt.Ignore());
         }
     }
 }
