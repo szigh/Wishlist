@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WishlistWeb.Services;
+using WishlistModels;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -66,6 +67,16 @@ builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 var app = builder.Build();
 
+// Apply database migrations automatically
+if (Environment.GetEnvironmentVariable("INTEGRATION_TEST") != "true")
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<WishlistDbContext>();
+        db.Database.Migrate();
+    }
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -73,7 +84,12 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+// HTTPS redirection disabled in development for simpler Docker setup
+// In production, use a reverse proxy (Traefik, nginx, ALB) to handle HTTPS
+if (app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseCors("AllowReactApp");
 
@@ -84,7 +100,7 @@ app.MapControllers();
 
 app.Run();
 
-//needed for CustomWebApplicationFactory
+// Make the implicit Program class accessible for integration testing with WebApplicationFactory
 #pragma warning disable ASP0027 // Unnecessary public Program class declaration
 public partial class Program{}
 #pragma warning restore ASP0027 // Unnecessary public Program class declaration

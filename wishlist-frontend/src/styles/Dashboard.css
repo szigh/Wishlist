@@ -11,12 +11,12 @@
 .dashboard-header h1 {
   margin: 0 0 8px 0;
   font-size: 32px;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .dashboard-header p {
   margin: 0;
-  color: #666;
+  color: var(--text-secondary);
   font-size: 18px;
 }
 
@@ -27,8 +27,8 @@
 }
 
 .user-card {
-  background: white;
-  border: 2px solid #e0e0e0;
+  background: var(--card-bg);
+  border: 2px solid var(--border-color);
   border-radius: 12px;
   padding: 24px;
   text-decoration: none;
@@ -40,15 +40,15 @@
 
 .user-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-  border-color: #667eea;
+  box-shadow: 0 8px 24px var(--card-hover-shadow);
+  border-color: var(--accent-primary);
 }
 
 .user-avatar {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
   color: white;
   display: flex;
   align-items: center;
@@ -60,13 +60,13 @@
 
 .user-info h3 {
   margin: 0 0 8px 0;
-  color: #333;
+  color: var(--text-primary);
   font-size: 20px;
 }
 
 .user-info p {
   margin: 0;
-  color: #667eea;
+  color: var(--accent-primary);
   font-size: 14px;
 }
 
@@ -74,12 +74,12 @@
   text-align: center;
   padding: 60px 20px;
   font-size: 18px;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: #999;
+  color: var(--text-muted);
   font-size: 18px;
 }
